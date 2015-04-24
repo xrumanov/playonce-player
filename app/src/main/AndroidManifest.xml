@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
 
-        <!--service class for music playback-->
+        <!--service class for music playback -->
         <service android:name="cz.muni.fi.pv239.playonceplayer.MusicService" />
     </application>
 </manifest>
