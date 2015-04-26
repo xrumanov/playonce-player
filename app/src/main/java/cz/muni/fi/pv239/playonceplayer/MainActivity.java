@@ -37,50 +37,45 @@ import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 
 public class MainActivity extends Activity implements MediaPlayerControl {
 
-    //where songs are stored
+    //song list variables
     private ArrayList<Song> songList;
-    //display the songs
     private ListView songView;
 
+    //service
     private MusicService musicSrv;
     private Intent playIntent;
+    //binding
     private boolean musicBound=false;
+
+    //controller
+    private MusicController controller;
 
     //activity and playback pause flags
     private boolean paused=false, playbackPaused=false;
-
-    //the widget
-    private MusicController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //retrieve list view instance using the ID we gave it in the main layout
+        //retrieve list view
         songView = (ListView)findViewById(R.id.song_list);
-
         //instantiate list
         songList = new ArrayList<Song>();
-
-        //get songs from device - helper method (see below)
+        //get songs from device
         getSongList();
-
-        //sort the songs alphabetically by title
+        //sort alphabetically by title
         Collections.sort(songList, new Comparator<Song>(){
             public int compare(Song a, Song b){
                 return a.getTitle().compareTo(b.getTitle());
             }
         });
-
         //create and set adapter
         SongAdapter songAdt = new SongAdapter(this, songList);
         songView.setAdapter(songAdt);
 
         //setup controller
         setController();
-
-
     }
 
     //connect to the service
@@ -102,7 +97,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
     };
 
-    //When the Activity instance starts, we create the Intent object, bind to it, and start it
+    //start and bind the service when the activity starts
     @Override
     protected void onStart() {
         super.onStart();
@@ -113,11 +108,9 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
     }
 
-    //We set the song position as the tag for each item in the list view when we defined
-    //the Adapter class. We retrieve it here and pass it to the Service instance
+    //user song select
     public void songPicked(View view){
-        Integer songIndex = (Integer) Integer.parseInt(view.getTag().toString());
-        musicSrv.setSong(songIndex);
+        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
         if(playbackPaused){
             setController();
@@ -149,21 +142,13 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         return super.onOptionsItemSelected(item);
     }
 
-    //helper method to retrieve the audio file information
+    //method to retrieve song info from device
     public void getSongList(){
-
-        //ContentResolver instance retrieves the URI for external music files
+        //query external audio
         ContentResolver musicResolver = getContentResolver();
-
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        //Cursor instance using the ContentResolver instance to query the music files
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-
         //iterate over results if valid
-        //First retrieve the column indexes for the data items that we are interested in for each song,
-        //then we use these to create a new Song object and add it to the list, before continuing
-        //to loop through the results.
         if(musicCursor!=null && musicCursor.moveToFirst()){
             //get columns
             int titleColumn = musicCursor.getColumnIndex
@@ -172,7 +157,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.ARTIST);
-
             //add songs to list
             do {
                 long thisId = musicCursor.getLong(idColumn);
@@ -186,36 +170,29 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     @Override
     public boolean canPause() {
-
         return true;
     }
 
     @Override
     public boolean canSeekBackward() {
-
         return true;
     }
 
     @Override
     public boolean canSeekForward() {
-
         return true;
     }
 
     @Override
     public int getAudioSessionId() {
-
         return 0;
     }
 
     @Override
     public int getBufferPercentage() {
-
         return 0;
     }
 
-    //The conditional tests are to avoid various exceptions
-    //that may occur when using the MediaPlayer and MediaController classes
     @Override
     public int getCurrentPosition() {
         if(musicSrv!=null && musicBound && musicSrv.isPng())
@@ -253,27 +230,22 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         musicSrv.go();
     }
 
-
     //set the controller up
     private void setController(){
         controller = new MusicController(this);
-
         //set previous and next button listeners
         controller.setPrevNextListeners(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 playNext();
             }
-
         }, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 playPrev();
             }
         });
-
-        //set the controller to work on media playback in the app, with its anchor view
-        // referring to the list we included in the layout
+        //set and show
         controller.setMediaPlayer(this);
         controller.setAnchorView(findViewById(R.id.song_list));
         controller.setEnabled(true);
@@ -303,7 +275,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         paused=true;
     }
 
-    //ensure that the controller displays when the user returns to the app
     @Override
     protected void onResume(){
         super.onResume();

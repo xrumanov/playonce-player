@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.os.IBinder;
 import android.content.Intent;
@@ -23,9 +24,11 @@ import android.content.Context;
 /**
  * Created by jrumanov on 4/24/15.
  */
+
 public class MusicService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener{
+        MediaPlayer.OnCompletionListener {//AudioManager.OnAudioFocusChangeListener
+
 
     //media player
     private MediaPlayer player;
@@ -57,28 +60,13 @@ public class MusicService extends Service implements
 
         rand=new Random();
 
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN);
+        //AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        //int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+        //        AudioManager.AUDIOFOCUS_GAIN);
 
-        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        //if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             // could not get audio focus.
-        }
-    }
-
-    @Override
-    public IBinder onBind(Intent arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    //release resources when the Service instance is unbound
-    //This will execute when the user exits the app - it stops the service
-    @Override
-    public boolean onUnbind(Intent intent){
-        player.stop();
-        player.release();
-        return false;
+       // }
     }
 
     public void initMusicPlayer(){
@@ -93,54 +81,31 @@ public class MusicService extends Service implements
         player.setOnErrorListener(this);
     }
 
+
+    //part of the interaction between the Activity and Service classes, for which we also need a Binder instance
+    public class MusicBinder extends Binder {
+        MusicService getService() {
+            return MusicService.this;
+        }
+    }
+
     //method to pass the list of songs from the Activity
     public void setList(ArrayList<Song> theSongs){
         songs=theSongs;
     }
 
-    //what to do when playing of one particular song end
     @Override
-    public void onCompletion(MediaPlayer mp) {
-        if(player.getCurrentPosition()>0){
-            mp.reset();
-            playNext();
-        }
+    public IBinder onBind(Intent intent) {
+        return musicBind;
     }
 
+    //release resources when the Service instance is unbound
+    //This will execute when the user exits the app - it stops the service
     @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        mp.reset();
+    public boolean onUnbind(Intent intent){
+        player.stop();
+        player.release();
         return false;
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        //start playback
-        mp.start();
-
-        Intent notIntent = new Intent(this, MainActivity.class);
-        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        //take the user back to the activity class when tap to the notification
-        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
-                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification.Builder builder = new Notification.Builder(this);
-
-        builder.setContentIntent(pendInt)
-                .setSmallIcon(R.drawable.play)
-                .setTicker(songTitle)
-                .setOngoing(true)
-                .setContentTitle("Playing")
-        .setContentText(songTitle);
-        Notification not = builder.build();
-
-        startForeground(NOTIFY_ID, not);
-    }
-
-    @Override
-    public void onDestroy() {
-        stopForeground(true);
     }
 
     public void playSong(){
@@ -178,17 +143,52 @@ public class MusicService extends Service implements
         songPosn=songIndex;
     }
 
+    //what to do when playing of one particular song end
     @Override
-    public void onAudioFocusChange(int focusChange) {
-        player.stop();
-    }
-
-    //part of the interaction between the Activity and Service classes, for which we also need a Binder instance
-    public class MusicBinder extends Binder {
-        MusicService getService() {
-            return MusicService.this;
+    public void onCompletion(MediaPlayer mp) {
+        if(player.getCurrentPosition()>0){
+            mp.reset();
+            playNext();
         }
     }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        Log.v("MUSIC PLAYER", "Playback Error");
+        mp.reset();
+        return false;
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        //start playback
+        mp.start();
+
+        Intent notIntent = new Intent(this, MainActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        //take the user back to the activity class when tap to the notification
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //Notification.Builder builder = new Notification.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        builder.setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.play)
+                .setTicker(songTitle)
+                .setOngoing(true)
+                .setContentTitle("Playing")
+                .setContentText(songTitle);
+        Notification not = builder.build();
+
+        startForeground(NOTIFY_ID, not);
+    }
+
+    //@Override
+    //public void onAudioFocusChange(int focusChange) {
+    //    player.stop();
+    //}
 
     //act on the control from the user in Activity
     public int getPosn(){
@@ -238,11 +238,17 @@ public class MusicService extends Service implements
         playSong();
     }
 
+
+    @Override
+    public void onDestroy() {
+        stopForeground(true);
+    }
+
+
     //set the shuffle flag
     public void setShuffle(){
         if(shuffle) shuffle=false;
         else shuffle=true;
     }
 }
-
 
