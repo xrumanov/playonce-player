@@ -40,7 +40,6 @@ public class MusicService extends Service implements
     //to complete binding process between Service and Activity
     private final IBinder musicBind = new MusicBinder();
 
-
     private String songTitle="";
     private static final int NOTIFY_ID=1;
 
@@ -48,6 +47,8 @@ public class MusicService extends Service implements
     private boolean shuffle=false;
     private Random rand;
 
+
+    //--------------------------lifecycle methods--------------------------------
     public void onCreate(){
         //create the service
         super.onCreate();
@@ -69,30 +70,10 @@ public class MusicService extends Service implements
        // }
     }
 
-    public void initMusicPlayer(){
-        //set player properties
-        player.setWakeMode(getApplicationContext(),
-                PowerManager.PARTIAL_WAKE_LOCK);
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        //there are onPrepared, onCompletion, and onError methods to respond to these events
-        player.setOnPreparedListener(this);
-        player.setOnCompletionListener(this);
-        player.setOnErrorListener(this);
-    }
-
-
-    //part of the interaction between the Activity and Service classes, for which we also need a Binder instance
-    public class MusicBinder extends Binder {
-        MusicService getService() {
-            return MusicService.this;
-        }
-    }
-
-    //method to pass the list of songs from the Activity
-    public void setList(ArrayList<Song> theSongs){
-        songs=theSongs;
-    }
+//    @Override
+//    public void onStartCommand(){
+//
+//    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -107,6 +88,91 @@ public class MusicService extends Service implements
         player.release();
         return false;
     }
+
+    @Override
+    public void onDestroy() {
+        stopForeground(true);
+    }
+    //-------------lifecycle methods END---------------------------
+
+
+    //------------onCompletionListener mandatory method------------
+    //what to do when playing of one particular song end
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        if(player.getCurrentPosition()>0){
+            mp.reset();
+            playNext();
+        }
+    }
+    //----------onCompletionListener mandatory method END----------
+
+
+    //------------onErrorListener mandatory method------------
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        Log.v("MUSIC PLAYER", "Playback Error");
+        mp.reset();
+        return false;
+    }
+    //----------onErrorListener mandatory method END------------
+
+    //------------onPreparedListener mandatory method------------
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        //start playback
+        mp.start();
+
+        Intent notIntent = new Intent(this, MainActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        //take the user back to the activity class when tap to the notification
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //Notification.Builder builder = new Notification.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        builder.setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.play)
+                .setTicker(songTitle)
+                .setOngoing(true)
+                .setContentTitle("Playing")
+                .setContentText(songTitle);
+        Notification not = builder.build();
+
+        startForeground(NOTIFY_ID, not);
+    }
+    //----------onPreparedListener mandatory method END-----------
+
+
+    //------------OnAudioFocusChangeListener mandatory method------------
+    //@Override
+    //public void onAudioFocusChange(int focusChange) {
+    //    player.stop();
+    //}
+    //----------OnAudioFocusChangeListener mandatory method END----------
+
+
+    public void initMusicPlayer(){
+        //set player properties
+        player.setWakeMode(getApplicationContext(),
+                PowerManager.PARTIAL_WAKE_LOCK);
+        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        //there are onPrepared, onCompletion, and onError methods to respond to these events
+        player.setOnPreparedListener(this);
+        player.setOnCompletionListener(this);
+        player.setOnErrorListener(this);
+    }
+
+    //method to pass the list of songs from the Activity
+    public void setList(ArrayList<Song> theSongs){
+
+        songs=theSongs;
+    }
+
+
 
     public void playSong(){
         //play a song
@@ -138,57 +204,11 @@ public class MusicService extends Service implements
         player.prepareAsync();
     }
 
+
     //set the current song
     public void setSong(int songIndex){
         songPosn=songIndex;
     }
-
-    //what to do when playing of one particular song end
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        if(player.getCurrentPosition()>0){
-            mp.reset();
-            playNext();
-        }
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.v("MUSIC PLAYER", "Playback Error");
-        mp.reset();
-        return false;
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        //start playback
-        mp.start();
-
-        Intent notIntent = new Intent(this, MainActivity.class);
-        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        //take the user back to the activity class when tap to the notification
-        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
-                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //Notification.Builder builder = new Notification.Builder(this);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-
-        builder.setContentIntent(pendInt)
-                .setSmallIcon(R.drawable.play)
-                .setTicker(songTitle)
-                .setOngoing(true)
-                .setContentTitle("Playing")
-                .setContentText(songTitle);
-        Notification not = builder.build();
-
-        startForeground(NOTIFY_ID, not);
-    }
-
-    //@Override
-    //public void onAudioFocusChange(int focusChange) {
-    //    player.stop();
-    //}
 
     //act on the control from the user in Activity
     public int getPosn(){
@@ -239,16 +259,19 @@ public class MusicService extends Service implements
     }
 
 
-    @Override
-    public void onDestroy() {
-        stopForeground(true);
-    }
-
-
     //set the shuffle flag
     public void setShuffle(){
         if(shuffle) shuffle=false;
         else shuffle=true;
+    }
+
+
+
+    //part of the interaction between the Activity and Service classes, for which we also need a Binder instance
+    public class MusicBinder extends Binder {
+        MusicService getService() {
+            return MusicService.this;
+        }
     }
 }
 

@@ -10,7 +10,9 @@
     <ListView
         android:id="@+id/song_list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
+        <!--android:saveEnabled="false"> for stop saving the Activity state to bundle-->
+
     </ListView>
 
 </LinearLayout>

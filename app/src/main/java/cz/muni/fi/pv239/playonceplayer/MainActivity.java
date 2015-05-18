@@ -16,6 +16,7 @@ import java.util.Comparator;
 import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.support.v4.app.NotificationCompat;
 import android.widget.ListView;
 
 import android.app.Activity;
@@ -53,9 +54,13 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     //activity and playback pause flags
     private boolean paused=false, playbackPaused=false;
 
+
+
+    //-------mandatory methods for Activity lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //create ui
         setContentView(R.layout.activity_main);
 
         //retrieve list view
@@ -78,25 +83,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         setController();
     }
 
-    //connect to the service
-    private ServiceConnection musicConnection = new ServiceConnection(){
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicBinder binder = (MusicBinder)service;
-            //get service
-            musicSrv = binder.getService();
-            //pass list
-            musicSrv.setList(songList);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
-        }
-    };
-
     //start and bind the service when the activity starts
     @Override
     protected void onStart() {
@@ -104,20 +90,39 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         if(playIntent==null){
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            //resulting to onStartCommand method in service class
             startService(playIntent);
         }
     }
 
-    //user song select
-    public void songPicked(View view){
-        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-        musicSrv.playSong();
-        if(playbackPaused){
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(paused){
             setController();
-            playbackPaused=false;
+            paused=false;
         }
-        controller.show(0);
     }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        paused=true;
+    }
+
+    @Override
+    protected void onStop() {
+        controller.hide();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(playIntent);
+        musicSrv=null;
+        super.onDestroy();
+    }
+    //-------mandatory methods for Activity lifecycle END
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,32 +147,27 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         return super.onOptionsItemSelected(item);
     }
 
-    //method to retrieve song info from device
-    public void getSongList(){
-        //query external audio
-        ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-        //iterate over results if valid
-        if(musicCursor!=null && musicCursor.moveToFirst()){
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
-            //add songs to list
-            do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist));
-            }
-            while (musicCursor.moveToNext());
-        }
-    }
+    //connect to the service
+    private ServiceConnection musicConnection = new ServiceConnection(){
 
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicBinder binder = (MusicBinder)service;
+            //get service
+            musicSrv = binder.getService();
+            //pass list
+            musicSrv.setList(songList);
+            musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+        }
+    };
+
+
+    //---------------implementation of MediaPlayerControl widget------------------
     @Override
     public boolean canPause() {
         return true;
@@ -229,6 +229,47 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     public void start() {
         musicSrv.go();
     }
+    //---------------implementation of MediaPlayerControl widget END------------------
+
+
+    //user song select
+    public void songPicked(View view){
+        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+        musicSrv.playSong();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
+        controller.show(0);
+    }
+
+    //method to retrieve song info from device
+    public void getSongList(){
+        //query external audio
+        ContentResolver musicResolver = getContentResolver();
+        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        //iterate over results if valid
+        if(musicCursor!=null && musicCursor.moveToFirst()){
+            //get columns
+            int titleColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.ARTIST);
+            //add songs to list
+            do {
+                long thisId = musicCursor.getLong(idColumn);
+                String thisTitle = musicCursor.getString(titleColumn);
+                String thisArtist = musicCursor.getString(artistColumn);
+                songList.add(new Song(thisId, thisTitle, thisArtist));
+            }
+            while (musicCursor.moveToNext());
+        }
+    }
+
+
 
     //set the controller up
     private void setController(){
@@ -251,6 +292,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         controller.setEnabled(true);
     }
 
+
     private void playNext(){
         musicSrv.playNext();
         if(playbackPaused){
@@ -259,6 +301,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
         controller.show(0);
     }
+
 
     private void playPrev(){
         musicSrv.playPrev();
@@ -269,32 +312,11 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         controller.show(0);
     }
 
-    @Override
-    protected void onPause(){
-        super.onPause();
-        paused=true;
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(paused){
-            setController();
-            paused=false;
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        controller.hide();
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        stopService(playIntent);
-        musicSrv=null;
-        super.onDestroy();
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle bundle){
+//        super.onSaveInstanceState(bundle);
+        //never use it to store persistent data, only transient state of the activity - state of UI
+        //you can test the state recreation by rotating the screen
+//    }
 
 }
