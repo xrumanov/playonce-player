@@ -2,35 +2,41 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cz.muni.fi.pv239.playonceplayer" >
 
+    <uses-sdk android:minSdkVersion="14" />
+
+    <uses-feature android:name="music" />
+
     <!-- let music playback continue when the user's device becomes idle -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/headphones"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!--for now, we will stick to portrait mode for simplicity-->
-        <!--launch mode will aid the process of navigating back to tha app-->
+        <!-- for now, we will stick to portrait mode for simplicity -->
+        <!-- launch mode will aid the process of navigating back to tha app -->
         <activity
+            android:name=".MainActivity"
             android:label="@string/app_name"
-            android:name="cz.muni.fi.pv239.playonceplayer.MainActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <!--says that this is the main entry point and should be run after user clicks on the icon-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!--service class for music playback -->
-        <service android:name="cz.muni.fi.pv239.playonceplayer.MusicService" />
+        <!-- service class for music playback -->
+        <service android:name=".MusicService" />
+
     </application>
+
 </manifest>
