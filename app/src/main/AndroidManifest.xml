@@ -29,7 +29,7 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <!--says that this is the main entry point and should be run after user clicks on the icon-->
+                <!-- says that this is the main entry point and should be run after user clicks on the icon -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -37,6 +37,10 @@
         <!-- service class for music playback -->
         <service android:name=".MusicService" />
 
+        <activity
+            android:name=".PlaylistActivity"
+            android:label="@string/title_activity_playlist" >
+        </activity>
     </application>
 
 </manifest>

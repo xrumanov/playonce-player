@@ -36,7 +36,7 @@ import android.view.Menu;
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 
 
-public class MainActivity extends Activity implements MediaPlayerControl {
+public class PlaylistActivity extends Activity implements MediaPlayerControl {
 
     //song list variables
     private ArrayList<Song> songList;
@@ -89,7 +89,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         super.onStart();
         if(playIntent==null){
             playIntent = new Intent(this, MusicService.class);
-            //bind service using musicConnection object
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             //resulting to onStartCommand method in service class
             startService(playIntent);
@@ -108,7 +107,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     @Override
     protected void onPause(){
         super.onPause();
-        //unbindService(musicConnection);
         paused=true;
     }
 
@@ -116,10 +114,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     protected void onStop() {
         controller.hide();
         super.onStop();
-        if(musicBound) {
-            unbindService(musicConnection);
-            musicBound=false;
-        }
     }
 
     @Override
@@ -153,7 +147,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         return super.onOptionsItemSelected(item);
     }
 
-    //deliver the IBinder that the client can use to communicate with the service
+    //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection(){
 
         @Override
@@ -168,7 +162,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
             musicBound = false;
         }
     };
@@ -257,30 +250,22 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
         //iterate over results if valid
-        if (!musicCursor.moveToFirst()) {
-            long thisId = 1;
-            String thisTitle = "there is nothing to show";
-            String thisArtist = "";
-            songList.add(new Song(thisId, thisTitle, thisArtist));
-
-        } else {
-            if (musicCursor != null && musicCursor.moveToFirst()) {
-                //get columns
-                int titleColumn = musicCursor.getColumnIndex
-                        (android.provider.MediaStore.Audio.Media.TITLE);
-                int idColumn = musicCursor.getColumnIndex
-                        (android.provider.MediaStore.Audio.Media._ID);
-                int artistColumn = musicCursor.getColumnIndex
-                        (android.provider.MediaStore.Audio.Media.ARTIST);
-                //add songs to list
-                do {
-                    long thisId = musicCursor.getLong(idColumn);
-                    String thisTitle = musicCursor.getString(titleColumn);
-                    String thisArtist = musicCursor.getString(artistColumn);
-                    songList.add(new Song(thisId, thisTitle, thisArtist));
-                }
-                while (musicCursor.moveToNext());
+        if(musicCursor!=null && musicCursor.moveToFirst()){
+            //get columns
+            int titleColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.ARTIST);
+            //add songs to list
+            do {
+                long thisId = musicCursor.getLong(idColumn);
+                String thisTitle = musicCursor.getString(titleColumn);
+                String thisArtist = musicCursor.getString(artistColumn);
+                songList.add(new Song(thisId, thisTitle, thisArtist));
             }
+            while (musicCursor.moveToNext());
         }
     }
 
@@ -330,8 +315,8 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 //    @Override
 //    protected void onSaveInstanceState(Bundle bundle){
 //        super.onSaveInstanceState(bundle);
-        //never use it to store persistent data, only transient state of the activity - state of UI
-        //you can test the state recreation by rotating the screen
+    //never use it to store persistent data, only transient state of the activity - state of UI
+    //you can test the state recreation by rotating the screen
 //    }
 
 }
