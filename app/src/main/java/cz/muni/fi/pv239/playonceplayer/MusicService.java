@@ -77,6 +77,7 @@ public class MusicService extends Service implements
 
     @Override
     public IBinder onBind(Intent intent) {
+
         return musicBind;
     }
 
@@ -270,6 +271,7 @@ public class MusicService extends Service implements
     //part of the interaction between the Activity and Service classes, for which we also need a Binder instance
     public class MusicBinder extends Binder {
         MusicService getService() {
+
             return MusicService.this;
         }
     }

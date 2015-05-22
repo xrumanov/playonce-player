@@ -89,6 +89,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         super.onStart();
         if(playIntent==null){
             playIntent = new Intent(this, MusicService.class);
+            //bind service using musicConnection object
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             //resulting to onStartCommand method in service class
             startService(playIntent);
@@ -107,6 +108,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     @Override
     protected void onPause(){
         super.onPause();
+        //unbindService(musicConnection);
         paused=true;
     }
 
@@ -114,6 +116,10 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     protected void onStop() {
         controller.hide();
         super.onStop();
+        if(musicBound) {
+            unbindService(musicConnection);
+            musicBound=false;
+        }
     }
 
     @Override
@@ -147,7 +153,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         return super.onOptionsItemSelected(item);
     }
 
-    //connect to the service
+    //deliver the IBinder that the client can use to communicate with the service
     private ServiceConnection musicConnection = new ServiceConnection(){
 
         @Override
@@ -162,6 +168,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+
             musicBound = false;
         }
     };
