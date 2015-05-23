@@ -7,6 +7,25 @@
     tools:context=".MainActivity" >
 
     <!-- ListView in which we will present the list of songs-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Internet Radio Streaming"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#ffff00d9" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START/STOP"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal"
+        android:clickable="true"
+        android:nestedScrollingEnabled="false"
+        android:onClick="buttonOnClick" />
+
     <ListView
         android:id="@+id/song_list"
         android:layout_width="fill_parent"

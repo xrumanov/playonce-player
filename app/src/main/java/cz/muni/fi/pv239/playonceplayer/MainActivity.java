@@ -10,6 +10,7 @@
 
 package cz.muni.fi.pv239.playonceplayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Button;
 import android.widget.ListView;
 
 import android.app.Activity;
@@ -32,6 +34,8 @@ import android.content.ServiceConnection;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+
+import android.media.MediaPlayer;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 
@@ -54,7 +58,8 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     //activity and playback pause flags
     private boolean paused=false, playbackPaused=false;
 
-
+    //media player for internet radio streaming
+    private MediaPlayer player = new MediaPlayer();
 
     //-------mandatory methods for Activity lifecycle
     @Override
@@ -94,6 +99,33 @@ public class MainActivity extends Activity implements MediaPlayerControl {
             //resulting to onStartCommand method in service class
             startService(playIntent);
         }
+
+        try {
+            player = new MediaPlayer();
+            player.reset();
+            player.setDataSource("http://icecast.stv.livebox.sk/slovensko_128.mp3");
+            player.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void buttonOnClick(View v){
+        if(player.isPlaying()) {
+            player.pause();
+            Button button = (Button) v;
+            ((Button) v).setText("PLAY");
+        }
+        else {
+            player.start();
+            ((Button) v).setText("PAUSE");
+        }
+        if(player.isLooping()){
+            System.out.println("---Media player is looping---");
+        }
+        else System.out.println("not looping");
+
+
     }
 
     @Override
@@ -126,6 +158,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     protected void onDestroy() {
         stopService(playIntent);
         musicSrv=null;
+        player.stop();
         super.onDestroy();
     }
     //-------mandatory methods for Activity lifecycle END
@@ -330,8 +363,8 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 //    @Override
 //    protected void onSaveInstanceState(Bundle bundle){
 //        super.onSaveInstanceState(bundle);
-        //never use it to store persistent data, only transient state of the activity - state of UI
-        //you can test the state recreation by rotating the screen
+    //never use it to store persistent data, only transient state of the activity - state of UI
+    //you can test the state recreation by rotating the screen
 //    }
 
 }
