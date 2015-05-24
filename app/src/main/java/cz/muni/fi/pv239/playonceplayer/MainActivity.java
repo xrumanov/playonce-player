@@ -38,6 +38,7 @@ import android.view.Menu;
 import android.media.MediaPlayer;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
+import cz.muni.fi.pv239.playonceplayer.StreamService.StreamBinder;
 
 
 public class MainActivity extends Activity implements MediaPlayerControl {
@@ -48,12 +49,16 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     //service
     private MusicService musicSrv;
+    private StreamService streamSrv;
     private Intent playIntent;
-    //binding
-    private boolean musicBound=false;
-
+    private Intent streamIntent;
     //controller
     private MusicController controller;
+
+
+    //binding
+    private boolean musicBound=false;
+    private boolean streamBound=false;
 
     //activity and playback pause flags
     private boolean paused=false, playbackPaused=false;
@@ -99,33 +104,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
             //resulting to onStartCommand method in service class
             startService(playIntent);
         }
-
-        try {
-            player = new MediaPlayer();
-            player.reset();
-            player.setDataSource("http://icecast.stv.livebox.sk/slovensko_128.mp3");
-            player.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void buttonOnClick(View v){
-        if(player.isPlaying()) {
-            player.pause();
-            Button button = (Button) v;
-            ((Button) v).setText("PLAY");
-        }
-        else {
-            player.start();
-            ((Button) v).setText("PAUSE");
-        }
-        if(player.isLooping()){
-            System.out.println("---Media player is looping---");
-        }
-        else System.out.println("not looping");
-
-
     }
 
     @Override
@@ -205,7 +183,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
             musicBound = false;
         }
     };
-
 
     //---------------implementation of MediaPlayerControl widget------------------
     @Override
@@ -366,5 +343,57 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     //never use it to store persistent data, only transient state of the activity - state of UI
     //you can test the state recreation by rotating the screen
 //    }
+
+
+
+    //deliver the stream IBinder that the client can use to communicate with the service
+    private ServiceConnection streamConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            StreamBinder binder = (StreamBinder)service;
+            //get service
+            streamSrv = binder.getService();
+            //pass list
+            streamBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+            musicBound = false;
+        }
+    };
+
+
+    public void buttonOnClick(View v){
+        if(streamIntent==null){
+            streamIntent = new Intent(this, StreamService.class);
+            //bind service using musicConnection object
+            bindService(streamIntent, streamConnection, Context.BIND_AUTO_CREATE);
+            //resulting to onStartCommand method in service class
+            startService(streamIntent);
+        } else{
+            if (musicBound){
+                musicSrv.unbindService(musicConnection);
+                musicBound=false;
+            }
+        }
+        if(player.isPlaying()) {
+            player.pause();
+            Button button = (Button) v;
+            ((Button) v).setText("PLAY");
+        }
+        else {
+            player.start();
+            ((Button) v).setText("PAUSE");
+        }
+        if(player.isLooping()){
+            System.out.println("---Media player is looping---");
+        }
+        else System.out.println("not looping");
+
+
+    }
 
 }
