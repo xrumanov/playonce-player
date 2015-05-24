@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
+import android.widget.CheckBox;
 import android.widget.ListView;
 
 import android.app.Activity;
@@ -41,6 +42,13 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
     //song list variables
     private ArrayList<Song> songList;
     private ListView songView;
+
+    //shuffled playlist helper
+    private ArrayList<Song> shuffledList;
+
+    //true, if checkbox is checked, false otherwise
+    private boolean shuffled;
+
 
     //service
     private MusicService musicSrv;
@@ -310,6 +318,20 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
             playbackPaused=false;
         }
         controller.show(0);
+    }
+
+    private void onCheckBoxShuffledClicked(View view){
+        CheckBox checkbox = (CheckBox) view;
+        if(checkbox.isChecked()){
+            shuffled = true;
+            shuffledList = songList;
+            Collections.shuffle(shuffledList);
+        }
+        else {
+
+            shuffled = false;
+        }
+
     }
 
 //    @Override

@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#000000"
+    tools:context=".PlaylistActivity" >
+
+    <!-- ListView in which we will present the list of songs-->
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="shuffled"
+        android:id="@+id/checkBox"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#ff000000"
+        android:checked="false"
+        android:background="#ff0043ff" />
+
+    <ListView
+        android:id="@+id/song_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <!--android:saveEnabled="false"> for stop saving the Activity state to bundle-->
+
+    </ListView>
+
+</LinearLayout><!-- From: file:/home/janca/Desktop/playonce-player/app/src/main/res/layout/activity_playlist.xml -->
