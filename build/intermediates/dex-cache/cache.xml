@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/janca/Desktop/playonce-player/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4e86306289ace4aa0cfec44a05ed2b410d36989d">
+        <dex dex="/home/janca/Desktop/playonce-player/app/build/intermediates/pre-dexed/debug/classes-c708b04803e89663e8b9d16e2f47f5d265d37293.jar" />
+    </item>
+    <item
+        jar="/home/janca/Desktop/playonce-player/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.0.0/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d84409890828e07d344a3b9b1da545dba9897b51">
+        <dex dex="/home/janca/Desktop/playonce-player/app/build/intermediates/pre-dexed/debug/classes-9dd205b24a760870ad2a736eadb98367ebd7d69b.jar" />
+    </item>
+    <item
+        jar="/home/janca/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/22.0.0/support-annotations-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
+        <dex dex="/home/janca/Desktop/playonce-player/app/build/intermediates/pre-dexed/debug/support-annotations-22.0.0-add4a4b4aaddfd9c8da54fa0fb6ef57f02e44059.jar" />
+    </item>
+    <item
+        jar="/home/janca/Desktop/playonce-player/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/libs/internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
+        <dex dex="/home/janca/Desktop/playonce-player/app/build/intermediates/pre-dexed/debug/internal_impl-22.0.0-c8aeb46867d503544ccef7df12df193826700f98.jar" />
+    </item>
+
+</items>

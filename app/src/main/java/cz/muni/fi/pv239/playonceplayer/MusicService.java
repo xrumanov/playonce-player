@@ -20,6 +20,7 @@ import java.util.Random;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 
 /**
  * Created by jrumanov on 4/24/15.

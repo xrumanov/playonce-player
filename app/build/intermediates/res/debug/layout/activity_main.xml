@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#000000"
+    tools:context=".MainActivity" >
+
+    <!-- ListView in which we will present the list of songs-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Internet Radio Streaming"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#ffff00d9" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START/STOP"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal"
+        android:clickable="true"
+        android:nestedScrollingEnabled="false"
+        android:onClick="buttonOnClick" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PLAYLIST"
+        android:id="@+id/button2"
+        android:layout_gravity="center_horizontal"
+        android:onClick="buttonPlaylist" />
+
+    <ListView
+        android:id="@+id/song_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <!--android:saveEnabled="false"> for stop saving the Activity state to bundle-->
+
+    </ListView>
+
+</LinearLayout><!-- From: file:/home/janca/Desktop/playonce-player/app/src/main/res/layout/activity_main.xml -->

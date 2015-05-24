@@ -106,6 +106,12 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
     }
 
+    public void buttonPlaylist(View view){
+
+        Intent i = new Intent(getApplicationContext(), PlaylistActivity.class);
+        startActivity(i);
+    }
+
     @Override
     protected void onResume(){
         super.onResume();
