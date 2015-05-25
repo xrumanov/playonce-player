@@ -72,14 +72,14 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
         setContentView(R.layout.activity_main);
 
         //retrieve list view
-        songView = (ListView)findViewById(R.id.song_list);
+        songView = (ListView) findViewById(R.id.song_list);
         //instantiate list
         songList = new ArrayList<Song>();
         //get songs from device
         getSongList();
         //sort alphabetically by title
-        Collections.sort(songList, new Comparator<Song>(){
-            public int compare(Song a, Song b){
+        Collections.sort(songList, new Comparator<Song>() {
+            public int compare(Song a, Song b) {
                 return a.getTitle().compareTo(b.getTitle());
             }
         });
