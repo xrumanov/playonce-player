@@ -17,6 +17,7 @@ import java.util.Comparator;
 import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Button;
 import android.widget.ListView;
@@ -65,6 +66,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     //media player for internet radio streaming
     private MediaPlayer player = new MediaPlayer();
+    private Handler handler;
 
     //-------mandatory methods for Activity lifecycle
     @Override
@@ -107,9 +109,22 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     }
 
     public void buttonPlaylist(View view){
+        handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                @Override
+                    public void run() {
+                        Intent i = new Intent(getApplicationContext(), PlaylistActivity.class);
+                        startActivity(i);
+                    }
+                });
 
-        Intent i = new Intent(getApplicationContext(), PlaylistActivity.class);
-        startActivity(i);
+            }
+        };
+
+       new Thread(runnable).start();
     }
 
     @Override
