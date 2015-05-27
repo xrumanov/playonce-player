@@ -116,8 +116,9 @@ public class MainActivity extends Activity implements MediaPlayerControl {
                 handler.post(new Runnable() {
                 @Override
                     public void run() {
-                        Intent i = new Intent(getApplicationContext(), PlaylistActivity.class);
-                        startActivity(i);
+                        Intent i = new Intent(MainActivity.this, PlaylistActivity.class);
+                     // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        MainActivity.this.startActivity(i);
                     }
                 });
 
@@ -293,6 +294,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
             String thisTitle = "there is nothing to show";
             String thisArtist = "";
             songList.add(new Song(thisId, thisTitle, thisArtist));
+
 
         } else {
             if (musicCursor != null && musicCursor.moveToFirst()) {

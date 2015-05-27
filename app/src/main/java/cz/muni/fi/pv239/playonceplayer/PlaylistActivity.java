@@ -33,6 +33,7 @@ import android.content.ServiceConnection;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 
@@ -69,7 +70,7 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //create ui
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_playlist);
 
         //retrieve list view
         songView = (ListView) findViewById(R.id.song_list);
@@ -258,22 +259,37 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
         //iterate over results if valid
-        if(musicCursor!=null && musicCursor.moveToFirst()){
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
-            //add songs to list
-            do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist));
+        if (!musicCursor.moveToFirst()) {
+            long thisId = 1;
+            String thisTitle = "Streamy";
+            String thisArtist = "Mc Kubo";
+            songList.add(new Song(thisId, thisTitle, thisArtist));
+            String thisTitle2 = "Just play";
+            String thisArtist2 = "Mc Janca";
+            songList.add(new Song(2, thisTitle2, thisArtist2));
+            String thisTitle3 = "Connect";
+            String thisArtist3 = "Mc Martin";
+            songList.add(new Song(3, thisTitle3, thisArtist3));
+
+
+        } else {
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                //add songs to list
+                do {
+                    long thisId = musicCursor.getLong(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    songList.add(new Song(thisId, thisTitle, thisArtist));
+                }
+                while (musicCursor.moveToNext());
             }
-            while (musicCursor.moveToNext());
         }
     }
 
@@ -320,17 +336,38 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
         controller.show(0);
     }
 
-    private void onCheckBoxShuffledClicked(View view){
+    public void onCheckBoxShuffledClicked(View view){
         CheckBox checkbox = (CheckBox) view;
         if(checkbox.isChecked()){
             shuffled = true;
+            TextView tv = (TextView)findViewById(R.id.textView3);
+            tv.setText("Shuffled enabled!");
             shuffledList = songList;
             Collections.shuffle(shuffledList);
         }
         else {
 
             shuffled = false;
+            TextView tv = (TextView)findViewById(R.id.textView3);
+            tv.setText("Shuffle disabled!");
         }
+
+    }
+
+    public void onPlayClicked(View view){
+        TextView tv = (TextView)findViewById(R.id.textView3);
+        tv.setText("Play was just clicked!");
+
+    }
+
+    public void onStopClicked(View view){
+        TextView tv = (TextView)findViewById(R.id.textView3);
+        tv.setText("Stop was just clicked!");
+
+    }
+
+    public void onBackClicked(View view){
+        this.onDestroy();
 
     }
 
