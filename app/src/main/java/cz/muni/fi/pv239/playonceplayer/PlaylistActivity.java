@@ -46,10 +46,11 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
 
     //shuffled playlist helper
     private ArrayList<Song> shuffledList;
+    //id of a song which is to be played next in shuffledList
+    private int shuffledSongId;
 
     //true, if checkbox is checked, false otherwise
     private boolean shuffled;
-
 
     //service
     private MusicService musicSrv;
@@ -340,10 +341,16 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
         CheckBox checkbox = (CheckBox) view;
         if(checkbox.isChecked()){
             shuffled = true;
-            TextView tv = (TextView)findViewById(R.id.textView3);
-            tv.setText("Shuffled enabled!");
             shuffledList = songList;
             Collections.shuffle(shuffledList);
+            String FYI_shuffle = "";
+            for (int j = 0; j < shuffledList.size(); j++){
+                FYI_shuffle += shuffledList.get(j).getArtist().toString()+"\n";
+            }
+            shuffledSongId=0;
+
+            TextView tv = (TextView)findViewById(R.id.textView3);
+            tv.setText("Shuffled arraylist is: \n"+FYI_shuffle);
         }
         else {
 
@@ -357,6 +364,21 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
     public void onPlayClicked(View view){
         TextView tv = (TextView)findViewById(R.id.textView3);
         tv.setText("Play was just clicked!");
+
+        if(shuffled){
+             if (shuffledSongId == (songList.size()-1)){
+                 tv.setText("You have reached the end of shuffled playlist");
+             }
+            else{
+                 Song nextSong = songList.get(shuffledSongId);
+                 tv.setText("Next song to play is " +nextSong.toString());
+             }
+        }
+        else {
+                playNext();
+                tv.setText("Next song in normal order.");
+
+        }
 
     }
 
