@@ -52,6 +52,15 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name="cz.muni.fi.pv239.playonceplayer.GeneratePlaylistActivity"
+            android:label="@string/title_activity_generate_playlist" >
+        </activity>
+        <activity
+            android:name="cz.muni.fi.pv239.playonceplayer.StreamRadioActivity"
+            android:label="@string/title_activity_stream_radio" >
+        </activity>
     </application>
 
 </manifest>
