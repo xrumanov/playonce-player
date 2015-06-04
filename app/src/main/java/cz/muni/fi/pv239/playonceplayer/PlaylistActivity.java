@@ -42,7 +42,7 @@ import android.widget.TextView;
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 
 
-public class PlaylistActivity extends ActionBarActivity implements MediaPlayerControl {
+public class PlaylistActivity extends ActionBarActivity {
 
     //song list variables
     private ArrayList<Song> songList;
@@ -63,10 +63,10 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
     private boolean musicBound=false;
 
     //controller
-    private MusicController controller;
+    //private MusicController controller;
 
     //activity and playback pause flags
-    private boolean paused=false, playbackPaused=false;
+    //private boolean paused=false, playbackPaused=false;
 
 
 
@@ -94,7 +94,7 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
         songView.setAdapter(songAdt);
 
         //setup controller
-        setController();
+        //setController();
     }
 
     //start and bind the service when the activity starts
@@ -109,33 +109,33 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
         }
     }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(paused){
-            setController();
-            paused=false;
-        }
-    }
+//    @Override
+//    protected void onResume(){
+//        super.onResume();
+//        if(paused){
+//            setController();
+//            paused=false;
+//        }
+//    }
 
-    @Override
-    protected void onPause(){
-        super.onPause();
-        paused=true;
-    }
-
-    @Override
-    protected void onStop() {
-        controller.hide();
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        stopService(playIntent);
-        musicSrv=null;
-        super.onDestroy();
-    }
+//    @Override
+//    protected void onPause(){
+//        super.onPause();
+//        paused=true;
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        controller.hide();
+//        super.onStop();
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        stopService(playIntent);
+//        musicSrv=null;
+//        super.onDestroy();
+//    }
     //-------mandatory methods for Activity lifecycle END
 
     @Override
@@ -167,67 +167,67 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
 
 
     //---------------implementation of MediaPlayerControl widget------------------
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        if(musicSrv!=null && musicBound && musicSrv.isPng())
-            return musicSrv.getPosn();
-        else return 0;
-    }
-
-    @Override
-    public int getDuration() {
-        if(musicSrv!=null && musicBound && musicSrv.isPng())
-            return musicSrv.getDur();
-        else return 0;
-    }
-
-    @Override
-    public boolean isPlaying() {
-        if(musicSrv!=null && musicBound)
-            return musicSrv.isPng();
-        return false;
-    }
-
-    @Override
-    public void pause() {
-        playbackPaused=true;
-        musicSrv.pausePlayer();
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        musicSrv.seek(pos);
-    }
-
-    @Override
-    public void start() {
-        musicSrv.go();
-    }
+//    @Override
+//    public boolean canPause() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean canSeekBackward() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean canSeekForward() {
+//        return true;
+//    }
+//
+//    @Override
+//    public int getAudioSessionId() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public int getBufferPercentage() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public int getCurrentPosition() {
+//        if(musicSrv!=null && musicBound && musicSrv.isPng())
+//            return musicSrv.getPosn();
+//        else return 0;
+//    }
+//
+//    @Override
+//    public int getDuration() {
+//        if(musicSrv!=null && musicBound && musicSrv.isPng())
+//            return musicSrv.getDur();
+//        else return 0;
+//    }
+//
+//    @Override
+//    public boolean isPlaying() {
+//        if(musicSrv!=null && musicBound)
+//            return musicSrv.isPng();
+//        return false;
+//    }
+//
+//    @Override
+//    public void pause() {
+//        playbackPaused=true;
+//        musicSrv.pausePlayer();
+//    }
+//
+//    @Override
+//    public void seekTo(int pos) {
+//        musicSrv.seek(pos);
+//    }
+//
+//    @Override
+//    public void start() {
+//        musicSrv.go();
+//    }
     //---------------implementation of MediaPlayerControl widget END------------------
 
 
@@ -242,11 +242,11 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
         i.putExtra("name", playingTitle);
         startActivity(i);
 
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
+//        if(playbackPaused){
+//            setController();
+//            playbackPaused=false;
+//        }
+//        controller.show(0);
     }
 
     //method to retrieve song info from device
@@ -293,45 +293,45 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
 
 
     //set the controller up
-    private void setController(){
-        controller = new MusicController(this);
-        //set previous and next button listeners
-        controller.setPrevNextListeners(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playNext();
-            }
-        }, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playPrev();
-            }
-        });
-        //set and show
-        controller.setMediaPlayer(this);
-        controller.setAnchorView(findViewById(R.id.song_list));
-        controller.setEnabled(true);
-    }
+//    private void setController(){
+//        controller = new MusicController(this);
+//        //set previous and next button listeners
+//        controller.setPrevNextListeners(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                playNext();
+//            }
+//        }, new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                playPrev();
+//            }
+//        });
+//        //set and show
+//        controller.setMediaPlayer(this);
+//        controller.setAnchorView(findViewById(R.id.song_list));
+//        controller.setEnabled(true);
+//    }
 
 
-    private void playNext(){
-        musicSrv.playNext();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
-
-
-    private void playPrev(){
-        musicSrv.playPrev();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
+//    private void playNext(){
+//        musicSrv.playNext();
+//        if(playbackPaused){
+//            setController();
+//            playbackPaused=false;
+//        }
+//        controller.show(0);
+//    }
+//
+//
+//    private void playPrev(){
+//        musicSrv.playPrev();
+//        if(playbackPaused){
+//            setController();
+//            playbackPaused=false;
+//        }
+//        controller.show(0);
+//    }
 
     public void onCheckBoxShuffledClicked(View view){
         CheckBox checkbox = (CheckBox) view;
@@ -373,7 +373,7 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
              }
         }
         else {
-                playNext();
+                //playNext();
                 tv.setText("Next song in normal order.");
 
         }

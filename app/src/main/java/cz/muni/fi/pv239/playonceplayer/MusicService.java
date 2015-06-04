@@ -49,6 +49,9 @@ public class MusicService extends Service implements
     private Random rand;
 
 
+    public String getSongTitle(){
+        return songTitle;
+    }
     //--------------------------lifecycle methods--------------------------------
     public void onCreate(){
         //create the service

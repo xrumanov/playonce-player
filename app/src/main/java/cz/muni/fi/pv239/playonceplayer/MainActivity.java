@@ -45,6 +45,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     private Intent streamIntent;
     //controller
     private MusicController controller;
+    private ActionBar actionBar;
 
 
     //binding
@@ -66,7 +67,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         setContentView(R.layout.activity_main);
 
 
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -92,11 +93,21 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 //        songView.setAdapter(songAdt);
 //
 //        //setup controller
-
-        if (isPlaying() || paused) {
-            controller.show(0);
-        } else {
+//
+//        if (isPlaying() || paused) {
+//            controller.show(0);
+//        } else {
             setController();
+            //controller.show(0);
+        }
+//    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if(getIntent().getStringExtra("name") != null){
+            controller.setBottom(100);
+            controller.show();
         }
     }
 
@@ -112,26 +123,6 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             startService(playIntent);
 
         }
-    }
-
-    public void buttonPlaylist(View view) {
-        handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent i = new Intent(MainActivity.this, PlaylistActivity.class);
-                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                        MainActivity.this.startActivity(i);
-                    }
-                });
-
-            }
-        };
-
-        new Thread(runnable).start();
     }
 
     @Override
@@ -261,16 +252,16 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     //---------------implementation of MediaPlayerControl widget END------------------
 
 
-    //user song select
-    public void songPicked(View view){
-        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-        musicSrv.playSong();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
-        }
-        controller.show(0);
-    }
+//    //user song select
+//    public void songPicked(View view){
+//        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+//        musicSrv.playSong();
+//        if(playbackPaused){
+//            setController();
+//            playbackPaused=false;
+//        }
+//        controller.show(0);
+//    }
 
     //method to retrieve song info from device
 //    public void getSongList(){
@@ -333,16 +324,19 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     private void playNext(){
         musicSrv.playNext();
+        actionBar.setTitle(musicSrv.getSongTitle());
         if(playbackPaused){
             setController();
             playbackPaused=false;
         }
+
         controller.show(0);
     }
 
 
     private void playPrev(){
         musicSrv.playPrev();
+        getActionBar().setTitle(musicSrv.getSongTitle());
         if(playbackPaused){
             setController();
             playbackPaused=false;
