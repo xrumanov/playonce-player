@@ -29,7 +29,6 @@ import android.widget.Button;
 import android.widget.MediaController.MediaPlayerControl;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
-import cz.muni.fi.pv239.playonceplayer.StreamService.StreamBinder;
 
 
 
@@ -39,7 +38,6 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     private MusicService musicSrv;
     private StreamService streamSrv;
     private Intent playIntent;
-    private Intent streamIntent;
     //controller
     private MusicController controller;
     private ActionBar actionBar;
@@ -47,13 +45,11 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     //binding
     private boolean musicBound = false;
-    private boolean streamBound = false;
+
 
     //activity and playback pause flags
     private boolean paused = false, playbackPaused = false;
 
-    //media player for internet radio streaming
-    private MediaPlayer player = new MediaPlayer();
     private Handler handler;
 
     //-------mandatory methods for Activity lifecycle
@@ -127,8 +123,6 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     @Override
     protected void onDestroy() {
         stopService(playIntent);
-        //musicSrv=null;
-        player.stop();
         super.onDestroy();
     }
     //-------mandatory methods for Activity lifecycle END
@@ -143,25 +137,6 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             //get service
             musicSrv = binder.getService();
             musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-            musicBound = false;
-        }
-    };
-
-    //deliver the stream IBinder that the client can use to communicate with the service
-    private ServiceConnection streamConnection = new ServiceConnection(){
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            StreamBinder binder = (StreamBinder)service;
-            //get service
-            streamSrv = binder.getService();
-            //pass list
-            streamBound = true;
         }
 
         @Override
@@ -221,7 +196,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     @Override
     public void pause() {
-        playbackPaused=true;
+        playbackPaused =true;
         musicSrv.pausePlayer();
     }
 
@@ -347,31 +322,5 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     private void showStreams(){
     Intent i = new Intent(MainActivity.this, StreamRadioActivity.class);
         MainActivity.this.startActivity(i);
-    }
-
-    //start stream radio
-    private void startStream() {
-
-
-        handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                    }
-                });
-            }
-        };
-
-        if (streamIntent == null) {
-            streamIntent = new Intent(this, StreamService.class);
-            //bind service using streamConnection object
-            bindService(streamIntent, streamConnection, Context.BIND_AUTO_CREATE);
-            //resulting to onStartCommand method in service class
-            startService(streamIntent);
-        }
     }
 }

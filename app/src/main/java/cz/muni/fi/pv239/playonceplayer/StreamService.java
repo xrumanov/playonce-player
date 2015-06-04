@@ -5,7 +5,10 @@ package cz.muni.fi.pv239.playonceplayer;
 
 import android.app.Service;
 import java.util.ArrayList;
+
+import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -31,7 +34,7 @@ public class StreamService extends Service implements
 
     //media player
     private MediaPlayer streamPlayer = new MediaPlayer();
-
+    private String streamUrl;
 
     //to complete binding process between Service and Activity
     private final IBinder streamBind = new StreamBinder();
@@ -43,21 +46,20 @@ public class StreamService extends Service implements
     public void onCreate(){
         //create the service
         super.onCreate();
-        //create player
-        //player = new MediaPlayer();
+        //ak nie je konektivita tak vypisat chybu
 
         initMusicPlayer();
-
-        String url = "http://icecast.stv.livebox.sk/slovensko_128.mp3"; // your URL here
-        try {
-            streamPlayer.setDataSource(url);
-            streamPlayer.prepare(); // might take long! (for buffering, etc)
-            streamPlayer.start();
-        } catch(java.io.IOException ioe) {
-            ioe.printStackTrace();
-        } catch(IllegalArgumentException iae) {
-            iae.printStackTrace();
-        }
+//
+//        String url = "http://icecast.stv.livebox.sk/slovensko_128.mp3"; // your URL here
+//        try {
+//            streamPlayer.setDataSource(url);
+//            streamPlayer.prepare(); // might take long! (for buffering, etc)
+//            streamPlayer.start();
+//        } catch(java.io.IOException ioe) {
+//            ioe.printStackTrace();
+//        } catch(IllegalArgumentException iae) {
+//            iae.printStackTrace();
+//        }
 
 
         }
@@ -93,7 +95,7 @@ public class StreamService extends Service implements
         //start playback
         mp.start();
 
-        Intent notIntent = new Intent(this, MainActivity.class);
+        Intent notIntent = new Intent(this, StreamRadioActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         //take the user back to the activity class when tap to the notification
@@ -122,6 +124,26 @@ public class StreamService extends Service implements
     //}
     //----------OnAudioFocusChangeListener mandatory method END----------
 
+    public void setStream(String stream){
+        streamUrl = stream;
+    }
+
+    public void playStream(){
+        try {
+            //feature request
+//            if(streamUrl.contains("m3u")){
+//                streamUrl = ParserM3UToURL.parse(streamUrl).get(0);
+//            }
+            streamPlayer.setDataSource(streamUrl);
+            streamPlayer.prepare(); // might take long! (for buffering, etc)
+            streamPlayer.start();
+        } catch(java.io.IOException ioe) {
+            ioe.printStackTrace();
+            //vypisat toast message!
+        } catch(IllegalArgumentException iae) {
+            iae.printStackTrace();
+        }
+    }
 
     public void initMusicPlayer(){
         //set player properties
@@ -129,7 +151,6 @@ public class StreamService extends Service implements
                 PowerManager.PARTIAL_WAKE_LOCK);
         streamPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
     }
-
 
     //part of the interaction between the Activity and Service classes, for which we also need a Binder instance
     public class StreamBinder extends Binder {
