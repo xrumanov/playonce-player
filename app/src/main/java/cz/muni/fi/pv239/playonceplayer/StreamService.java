@@ -83,8 +83,8 @@ public class StreamService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         if (streamPlayer.isPlaying()) {
-            streamPlayer.stop();
-            streamPlayer = null;
+            streamPlayer.reset();
+            //streamPlayer = null;
         }
     }
     //-------------lifecycle methods END---------------------------

@@ -16,28 +16,20 @@ import java.util.Comparator;
 import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ListView;
 
-import android.app.Activity;
-//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
-import android.widget.MediaController.MediaPlayerControl;
 import android.os.Bundle;
 import android.content.ServiceConnection;
 import android.content.ComponentName;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
-import android.widget.TextView;
+
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 

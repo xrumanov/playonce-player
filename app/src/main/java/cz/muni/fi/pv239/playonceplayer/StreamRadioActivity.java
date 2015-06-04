@@ -39,8 +39,17 @@ public class StreamRadioActivity extends ActionBarActivity {
 
         data = new ArrayList<Radio>();
         data.add( new Radio(1, "Radio Slovensko","http://icecast.stv.livebox.sk/slovensko_128.mp3"));
-        data.add( new Radio(2, "Europa2 SK","http://pool.cdn.lagardere.cz/fm-europa2sk-128"));
-        data.add( new Radio(3, "Evropa2 CZ","http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add(new Radio(2, "Europa2 SK", "http://pool.cdn.lagardere.cz/fm-europa2sk-128"));
+        data.add(new Radio(3, "Evropa2 CZ", "http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add( new Radio(4, "Kiss Hady","http://icecast1.play.cz/kisshady64.mp3"));
+        data.add( new Radio(5, "BBC UK CZ","http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add( new Radio(6, "Deutsche Welle","http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add(new Radio(7, "OE3", "http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add( new Radio(8, "Evropa2 CZ","http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add( new Radio(9, "Evropa2 CZ","http://icecast3.play.cz:80/evropa2-128.mp3"));
+
+
+
 
 
         ListView lv = (ListView) findViewById(R.id.radio_list);
@@ -160,6 +169,11 @@ private ServiceConnection streamConnection = new ServiceConnection(){
 
         new Thread(runnable).start();
     }
-}
 
-//TODo pridat playlisty, pridat shuffle
+    //stop button for streams
+    public void streamStopOnClick(View view) {
+        if (streamSrv != null) {
+            streamSrv.onDestroy();
+        }
+    }
+}
