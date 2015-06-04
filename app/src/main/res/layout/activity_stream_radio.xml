@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,6 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:weightSum="1"
     android:orientation="vertical"
     tools:context=".StreamRadioActivity">
 
@@ -15,4 +16,17 @@
         android:layout_height="wrap_content" >
     </ListView>
 
-</RelativeLayout>
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:textColor="#FFFFFF"
+        android:background="#000000"
+        android:text="STOP"
+        android:textStyle="bold"
+        android:id="@+id/stop_stream"
+        android:clickable="true"
+        android:nestedScrollingEnabled="false"
+        android:onClick="streamStopOnClick" />
+
+</LinearLayout>

@@ -8,6 +8,7 @@
         android:id="@+id/radioname"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:padding="12dp"
         android:textSize="20sp" />
 

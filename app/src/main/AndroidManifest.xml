@@ -40,7 +40,8 @@
 
         <activity
             android:name=".PlaylistActivity"
-            android:label="@string/title_activity_playlist" >
+            android:label="@string/title_activity_playlist"
+            android:screenOrientation="portrait" >
         </activity>
 
         <service
@@ -51,11 +52,13 @@
 
         <activity
             android:name=".GeneratePlaylistActivity"
-            android:label="@string/title_activity_generate_playlist" >
+            android:label="@string/title_activity_generate_playlist"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".StreamRadioActivity"
-            android:label="@string/title_activity_stream_radio" >
+            android:label="@string/title_activity_stream_radio"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

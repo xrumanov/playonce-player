@@ -16,21 +16,4 @@
         <!--android:saveEnabled="false"> for stop saving the Activity state to bundle-->
 
     </ListView>
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="shuffle"
-        android:id="@+id/checkBox2"
-        android:onClick="onCheckBoxShuffledClicked"
-        android:layout_gravity="right" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="This is for your information."
-        android:id="@+id/textView3"
-        android:layout_gravity="right"
-        android:textColor="#ffff00cf" />
-
 </LinearLayout>
