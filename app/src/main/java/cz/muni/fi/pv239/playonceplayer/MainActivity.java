@@ -24,21 +24,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
 import android.widget.MediaController.MediaPlayerControl;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 import cz.muni.fi.pv239.playonceplayer.StreamService.StreamBinder;
 
-//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
 
 
 public class MainActivity extends ActionBarActivity implements MediaPlayerControl {
 
-    //    //song list variables
-//    private ArrayList<Song> songList;
-//    private ListView songView;
-//
-//    //service
+   //service
     private MusicService musicSrv;
     private StreamService streamSrv;
     private Intent playIntent;
@@ -74,39 +71,16 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
         if (getIntent().getStringExtra("name") != null) {
             actionBar.setTitle(getIntent().getStringExtra("name"));
-            //controller.show(0);
-        } else actionBar.setTitle("Choose a song!");
-//        //retrieve list view
-//        songView = (ListView)findViewById(R.id.song_list);
-//        //instantiate list
-//        songList = new ArrayList<Song>();
-//        //get songs from device
-//        getSongList();
-//        //sort alphabetically by title
-//        Collections.sort(songList, new Comparator<Song>() {
-//            public int compare(Song a, Song b) {
-//                return a.getTitle().compareTo(b.getTitle());
-//            }
-//        });
-//        //create and set adapter
-//        SongAdapter songAdt = new SongAdapter(this, songList);
-//        songView.setAdapter(songAdt);
-//
-//        //setup controller
-//
-//        if (isPlaying() || paused) {
-//            controller.show(0);
-//        } else {
-            setController();
-            //controller.show(0);
+        } else {
+            actionBar.setTitle("Choose a song!");
         }
-//    }
+            setController();
+        }
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         if(getIntent().getStringExtra("name") != null){
-            controller.setBottom(100);
             controller.show();
         }
     }
@@ -137,7 +111,6 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     @Override
     protected void onPause() {
         super.onPause();
-        //unbindService(musicConnection);
         paused = true;
     }
 
@@ -160,12 +133,6 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     }
     //-------mandatory methods for Activity lifecycle END
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
     //deliver the IBinder that the client can use to communicate with the service
     private ServiceConnection musicConnection = new ServiceConnection(){
@@ -175,9 +142,26 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             MusicBinder binder = (MusicBinder)service;
             //get service
             musicSrv = binder.getService();
-            //pass list
-            //musicSrv.setList(songList);
             musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+            musicBound = false;
+        }
+    };
+
+    //deliver the stream IBinder that the client can use to communicate with the service
+    private ServiceConnection streamConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            StreamBinder binder = (StreamBinder)service;
+            //get service
+            streamSrv = binder.getService();
+            //pass list
+            streamBound = true;
         }
 
         @Override
@@ -215,14 +199,14 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     @Override
     public int getCurrentPosition() {
-        if(musicSrv!=null && musicBound && musicSrv.isPng())
+        if(musicSrv!=null && musicBound)// && musicSrv.isPng()
             return musicSrv.getPosn();
         else return 0;
     }
 
     @Override
     public int getDuration() {
-        if(musicSrv!=null && musicBound && musicSrv.isPng())
+        if(musicSrv!=null && musicBound)// && musicSrv.isPng()
             return musicSrv.getDur();
         else return 0;
     }
@@ -231,6 +215,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     public boolean isPlaying() {
         if(musicSrv!=null && musicBound)
             return musicSrv.isPng();
+            playbackPaused = false;
         return false;
     }
 
@@ -251,54 +236,42 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     }
     //---------------implementation of MediaPlayerControl widget END------------------
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-//    //user song select
-//    public void songPicked(View view){
-//        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-//        musicSrv.playSong();
-//        if(playbackPaused){
-//            setController();
-//            playbackPaused=false;
-//        }
-//        controller.show(0);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //menu item selected
+        switch (item.getItemId()) {
+            case R.id.action_shuffle:
+                break;
+            case R.id.action_playlist:
+                if(streamSrv != null){
+                    streamSrv.onDestroy();
+                }
+                this.showPlaylist();
 
-    //method to retrieve song info from device
-//    public void getSongList(){
-//        //query external audio
-//        ContentResolver musicResolver = getContentResolver();
-//        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-//        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-//        //iterate over results if valid
-//        if (!musicCursor.moveToFirst()) {
-//            long thisId = 1;
-//            String thisTitle = "there is nothing to show";
-//            String thisArtist = "";
-//            songList.add(new Song(thisId, thisTitle, thisArtist));
-//
-//
-//        } else {
-//            if (musicCursor != null && musicCursor.moveToFirst()) {
-//                //get columns
-//                int titleColumn = musicCursor.getColumnIndex
-//                        (android.provider.MediaStore.Audio.Media.TITLE);
-//                int idColumn = musicCursor.getColumnIndex
-//                        (android.provider.MediaStore.Audio.Media._ID);
-//                int artistColumn = musicCursor.getColumnIndex
-//                        (android.provider.MediaStore.Audio.Media.ARTIST);
-//                //add songs to list
-//                do {
-//                    long thisId = musicCursor.getLong(idColumn);
-//                    String thisTitle = musicCursor.getString(titleColumn);
-//                    String thisArtist = musicCursor.getString(artistColumn);
-//                    songList.add(new Song(thisId, thisTitle, thisArtist));
-//                }
-//                while (musicCursor.moveToNext());
-//            }
-//        }
-//    }
+                break;
+            case R.id.action_stream:
+                if(musicSrv != null){
+                    musicSrv.onDestroy();
 
+                    //mozno este odbindovat a vsetko ukoncit
+                }
+                this.showStreams();
+                break;
+            case R.id.action_generated_playlists:
 
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
 
     //set the controller up
     private void setController(){
@@ -334,43 +307,18 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     }
 
 
-    private void playPrev(){
+    private void playPrev() {
         musicSrv.playPrev();
         getActionBar().setTitle(musicSrv.getSongTitle());
-        if(playbackPaused){
+        if (playbackPaused) {
             setController();
-            playbackPaused=false;
+            playbackPaused = false;
         }
         controller.show(0);
     }
 
-//    @Override
-//    protected void onSaveInstanceState(Bundle bundle){
-//        super.onSaveInstanceState(bundle);
-    //never use it to store persistent data, only transient state of the activity - state of UI
-    //you can test the state recreation by rotating the screen
-//    }
 
-
-
-    //deliver the stream IBinder that the client can use to communicate with the service
-    private ServiceConnection streamConnection = new ServiceConnection(){
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            StreamBinder binder = (StreamBinder)service;
-            //get service
-            streamSrv = binder.getService();
-            //pass list
-            streamBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-            musicBound = false;
-        }
-    };
+    //-------------auxiliary methods for menu------------------------
 
     //show playlist activity
     private void showPlaylist(){
@@ -424,36 +372,5 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             //resulting to onStartCommand method in service class
             startService(streamIntent);
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //menu item selected
-        switch (item.getItemId()) {
-            case R.id.action_shuffle:
-//                musicSrv.setShuffle();
-                break;
-            case R.id.action_playlist:
-                if(streamSrv != null){
-                    streamSrv.onDestroy();
-                }
-                this.showPlaylist();
-
-                break;
-            case R.id.action_stream:
-                if(musicSrv != null){
-                    musicSrv.onDestroy();
-                    //mozno este odbindovat a vsetko ukoncit
-                }
-                //this.startStream();
-                this.showStreams();
-                break;
-            case R.id.action_generated_playlists:
-
-                break;
-
-        }
-        return super.onOptionsItemSelected(item);
-
     }
 }
