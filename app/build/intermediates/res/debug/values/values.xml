@@ -173,8 +173,10 @@
     <string name="app_name">PlayOncePlayer</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_generate_playlist">GeneratePlaylistActivity</string>
     <string name="title_activity_player">PlayerActivity</string>
     <string name="title_activity_playlist">PlaylistActivity</string>
+    <string name="title_activity_stream_radio">StreamRadioActivity</string>
     <string name="title_activity_test">test</string>
     <!-- From: file:/home/janca/Desktop/playonce-player/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.0.0/res/values/values.xml -->
     <eat-comment/>

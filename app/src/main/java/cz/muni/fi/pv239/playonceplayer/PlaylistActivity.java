@@ -347,12 +347,14 @@ public class PlaylistActivity extends ActionBarActivity implements MediaPlayerCo
 
             TextView tv = (TextView)findViewById(R.id.textView3);
             tv.setText("Shuffled arraylist is: \n"+FYI_shuffle);
+            musicSrv.setList(shuffledList);
         }
         else {
 
             shuffled = false;
             TextView tv = (TextView)findViewById(R.id.textView3);
             tv.setText("Shuffle disabled!");
+            musicSrv.setList(songList);
         }
 
     }
