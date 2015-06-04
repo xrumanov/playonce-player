@@ -28,5 +28,10 @@ public class Radio {
     public String getUri(){
         return uri;
     }
+
+    // String representation
+    public String toString() {
+        return this.radioname;
+    }
 }
 

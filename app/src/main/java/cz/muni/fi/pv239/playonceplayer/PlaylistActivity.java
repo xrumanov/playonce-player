@@ -62,14 +62,6 @@ public class PlaylistActivity extends ActionBarActivity {
     //binding
     private boolean musicBound=false;
 
-    //controller
-    //private MusicController controller;
-
-    //activity and playback pause flags
-    //private boolean paused=false, playbackPaused=false;
-
-
-
     //-------mandatory methods for Activity lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,9 +84,6 @@ public class PlaylistActivity extends ActionBarActivity {
         //create and set adapter
         SongAdapter songAdt = new SongAdapter(this, songList);
         songView.setAdapter(songAdt);
-
-        //setup controller
-        //setController();
     }
 
     //start and bind the service when the activity starts
@@ -108,34 +97,6 @@ public class PlaylistActivity extends ActionBarActivity {
             startService(playIntent);
         }
     }
-
-//    @Override
-//    protected void onResume(){
-//        super.onResume();
-//        if(paused){
-//            setController();
-//            paused=false;
-//        }
-//    }
-
-//    @Override
-//    protected void onPause(){
-//        super.onPause();
-//        paused=true;
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        controller.hide();
-//        super.onStop();
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//        stopService(playIntent);
-//        musicSrv=null;
-//        super.onDestroy();
-//    }
     //-------mandatory methods for Activity lifecycle END
 
     @Override
@@ -145,6 +106,30 @@ public class PlaylistActivity extends ActionBarActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //menu item selected
+        switch (item.getItemId()) {
+            case R.id.action_shuffle:
+                break;
+            case R.id.action_playlist:
+                break;
+            case R.id.action_stream:
+                if(musicSrv != null){
+                    musicSrv.onDestroy();
+
+                    //mozno este odbindovat a vsetko ukoncit
+                }
+                this.showStreams();
+                break;
+            case R.id.action_generated_playlists:
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
 
     //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection(){
@@ -165,72 +150,6 @@ public class PlaylistActivity extends ActionBarActivity {
         }
     };
 
-
-    //---------------implementation of MediaPlayerControl widget------------------
-//    @Override
-//    public boolean canPause() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean canSeekBackward() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean canSeekForward() {
-//        return true;
-//    }
-//
-//    @Override
-//    public int getAudioSessionId() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int getBufferPercentage() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int getCurrentPosition() {
-//        if(musicSrv!=null && musicBound && musicSrv.isPng())
-//            return musicSrv.getPosn();
-//        else return 0;
-//    }
-//
-//    @Override
-//    public int getDuration() {
-//        if(musicSrv!=null && musicBound && musicSrv.isPng())
-//            return musicSrv.getDur();
-//        else return 0;
-//    }
-//
-//    @Override
-//    public boolean isPlaying() {
-//        if(musicSrv!=null && musicBound)
-//            return musicSrv.isPng();
-//        return false;
-//    }
-//
-//    @Override
-//    public void pause() {
-//        playbackPaused=true;
-//        musicSrv.pausePlayer();
-//    }
-//
-//    @Override
-//    public void seekTo(int pos) {
-//        musicSrv.seek(pos);
-//    }
-//
-//    @Override
-//    public void start() {
-//        musicSrv.go();
-//    }
-    //---------------implementation of MediaPlayerControl widget END------------------
-
-
     //user song select
     public void songPicked(View view){
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
@@ -241,12 +160,6 @@ public class PlaylistActivity extends ActionBarActivity {
         String playingTitle = songList.get(pos).getTitle();
         i.putExtra("name", playingTitle);
         startActivity(i);
-
-//        if(playbackPaused){
-//            setController();
-//            playbackPaused=false;
-//        }
-//        controller.show(0);
     }
 
     //method to retrieve song info from device
@@ -290,112 +203,8 @@ public class PlaylistActivity extends ActionBarActivity {
         }
     }
 
-
-
-    //set the controller up
-//    private void setController(){
-//        controller = new MusicController(this);
-//        //set previous and next button listeners
-//        controller.setPrevNextListeners(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                playNext();
-//            }
-//        }, new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                playPrev();
-//            }
-//        });
-//        //set and show
-//        controller.setMediaPlayer(this);
-//        controller.setAnchorView(findViewById(R.id.song_list));
-//        controller.setEnabled(true);
-//    }
-
-
-//    private void playNext(){
-//        musicSrv.playNext();
-//        if(playbackPaused){
-//            setController();
-//            playbackPaused=false;
-//        }
-//        controller.show(0);
-//    }
-//
-//
-//    private void playPrev(){
-//        musicSrv.playPrev();
-//        if(playbackPaused){
-//            setController();
-//            playbackPaused=false;
-//        }
-//        controller.show(0);
-//    }
-
-    public void onCheckBoxShuffledClicked(View view){
-        CheckBox checkbox = (CheckBox) view;
-        if(checkbox.isChecked()){
-            shuffled = true;
-            shuffledList = songList;
-            Collections.shuffle(shuffledList);
-            String FYI_shuffle = "";
-            for (int j = 0; j < shuffledList.size(); j++){
-                FYI_shuffle += shuffledList.get(j).getArtist().toString()+"\n";
-            }
-            shuffledSongId=0;
-
-            TextView tv = (TextView)findViewById(R.id.textView3);
-            tv.setText("Shuffled arraylist is: \n"+FYI_shuffle);
-            musicSrv.setList(shuffledList);
-        }
-        else {
-
-            shuffled = false;
-            TextView tv = (TextView)findViewById(R.id.textView3);
-            tv.setText("Shuffle disabled!");
-            musicSrv.setList(songList);
-        }
-
+    private void showStreams(){
+        Intent i = new Intent(PlaylistActivity.this, StreamRadioActivity.class);
+        PlaylistActivity.this.startActivity(i);
     }
-
-    public void onPlayClicked(View view){
-        TextView tv = (TextView)findViewById(R.id.textView3);
-        tv.setText("Play was just clicked!");
-
-        if(shuffled){
-             if (shuffledSongId == (songList.size()-1)){
-                 tv.setText("You have reached the end of shuffled playlist");
-             }
-            else{
-                 Song nextSong = songList.get(shuffledSongId);
-                 tv.setText("Next song to play is " +nextSong.toString());
-             }
-        }
-        else {
-                //playNext();
-                tv.setText("Next song in normal order.");
-
-        }
-
-    }
-
-    public void onStopClicked(View view){
-        TextView tv = (TextView)findViewById(R.id.textView3);
-        tv.setText("Stop was just clicked!");
-
-    }
-
-    public void onBackClicked(View view){
-        this.onDestroy();
-
-    }
-
-//    @Override
-//    protected void onSaveInstanceState(Bundle bundle){
-//        super.onSaveInstanceState(bundle);
-    //never use it to store persistent data, only transient state of the activity - state of UI
-    //you can test the state recreation by rotating the screen
-//    }
-
 }

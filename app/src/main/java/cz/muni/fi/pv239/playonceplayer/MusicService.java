@@ -52,6 +52,7 @@ public class MusicService extends Service implements
     public String getSongTitle(){
         return songTitle;
     }
+
     //--------------------------lifecycle methods--------------------------------
     public void onCreate(){
         //create the service
@@ -252,19 +253,10 @@ public class MusicService extends Service implements
         playSong();
     }
 
-    //skip to next song with shuffling feature
     public void playNext(){
-        if(shuffle){
-            int newSong = songPosn;
-            while(newSong==songPosn){
-                newSong=rand.nextInt(songs.size());
-            }
-            songPosn=newSong;
-        }
-        else{
-            songPosn++;
-            if(songPosn>=songs.size()) songPosn=0;
-        }
+        songPosn++;
+        if(songPosn>=songs.size()) songPosn=0;
+
         playSong();
     }
 

@@ -25,7 +25,8 @@ import android.content.Context;
  * Created by jrumanov on 4/24/15.
  */
 
-public class StreamService extends Service {//AudioManager.OnAudioFocusChangeListener
+public class StreamService extends Service implements
+        MediaPlayer.OnPreparedListener {//AudioManager.OnAudioFocusChangeListener
 
 
     //media player
@@ -86,6 +87,33 @@ public class StreamService extends Service {//AudioManager.OnAudioFocusChangeLis
     }
     //-------------lifecycle methods END---------------------------
 
+    //------------onPreparedListener mandatory method------------
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        //start playback
+        mp.start();
+
+        Intent notIntent = new Intent(this, MainActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        //take the user back to the activity class when tap to the notification
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //Notification.Builder builder = new Notification.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        builder.setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.play)
+                .setTicker("Streaming radio")
+                .setOngoing(true)
+                .setContentTitle("Playing")
+                .setContentText("Streaming radio");
+        Notification not = builder.build();
+
+        startForeground(NOTIFY_ID, not);
+    }
+    //----------onPreparedListener mandatory method END-----------
 
     //------------OnAudioFocusChangeListener mandatory method------------
     //@Override

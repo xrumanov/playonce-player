@@ -199,14 +199,14 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     @Override
     public int getCurrentPosition() {
-        if(musicSrv!=null && musicBound)// && musicSrv.isPng()
+        if(musicSrv!=null && musicBound && musicSrv.isPng())//
             return musicSrv.getPosn();
         else return 0;
     }
 
     @Override
     public int getDuration() {
-        if(musicSrv!=null && musicBound)// && musicSrv.isPng()
+        if(musicSrv!=null && musicBound && musicSrv.isPng())
             return musicSrv.getDur();
         else return 0;
     }
@@ -228,6 +228,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     @Override
     public void seekTo(int pos) {
         musicSrv.seek(pos);
+
     }
 
     @Override
@@ -309,7 +310,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     private void playPrev() {
         musicSrv.playPrev();
-        getActionBar().setTitle(musicSrv.getSongTitle());
+        actionBar.setTitle(musicSrv.getSongTitle());
         if (playbackPaused) {
             setController();
             playbackPaused = false;

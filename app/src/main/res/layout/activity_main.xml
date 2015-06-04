@@ -5,12 +5,20 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
+    <ImageView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:scaleType="center"
+    android:id="@+id/antwork"
+    android:src="@drawable/antwork"
+    />
+    <!--</RelativeLayout>-->
     <!-- ListView in which we will present the list of songs-->
 
     <ListView
         android:id="@+id/song_list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="fill_parent">
         <!--android:saveEnabled="false"> for stop saving the Activity state to bundle-->
 
     </ListView>
