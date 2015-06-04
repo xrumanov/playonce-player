@@ -17,6 +17,10 @@ import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
@@ -38,7 +42,7 @@ import android.widget.TextView;
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 
 
-public class PlaylistActivity extends Activity implements MediaPlayerControl {
+public class PlaylistActivity extends ActionBarActivity implements MediaPlayerControl {
 
     //song list variables
     private ArrayList<Song> songList;
@@ -141,21 +145,6 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //menu item selected
-        switch (item.getItemId()) {
-            case R.id.action_shuffle:
-                musicSrv.setShuffle();
-                break;
-            case R.id.action_end:
-                stopService(playIntent);
-                musicSrv=null;
-                System.exit(0);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection(){
@@ -246,6 +235,13 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
     public void songPicked(View view){
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
+
+        Intent i = new Intent(PlaylistActivity.this ,MainActivity.class);
+        int pos = Integer.parseInt(view.getTag().toString());
+        String playingTitle = songList.get(pos).getTitle();
+        i.putExtra("name", playingTitle);
+        startActivity(i);
+
         if(playbackPaused){
             setController();
             playbackPaused=false;
@@ -261,16 +257,16 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
         //iterate over results if valid
         if (!musicCursor.moveToFirst()) {
-            long thisId = 1;
+            String thisId = "1";
             String thisTitle = "Streamy";
             String thisArtist = "Mc Kubo";
             songList.add(new Song(thisId, thisTitle, thisArtist));
             String thisTitle2 = "Just play";
             String thisArtist2 = "Mc Janca";
-            songList.add(new Song(2, thisTitle2, thisArtist2));
+            songList.add(new Song("2", thisTitle2, thisArtist2));
             String thisTitle3 = "Connect";
             String thisArtist3 = "Mc Martin";
-            songList.add(new Song(3, thisTitle3, thisArtist3));
+            songList.add(new Song("3", thisTitle3, thisArtist3));
 
 
         } else {
@@ -284,7 +280,7 @@ public class PlaylistActivity extends Activity implements MediaPlayerControl {
                         (android.provider.MediaStore.Audio.Media.ARTIST);
                 //add songs to list
                 do {
-                    long thisId = musicCursor.getLong(idColumn);
+                    String thisId = String.valueOf(musicCursor.getLong(idColumn));
                     String thisTitle = musicCursor.getString(titleColumn);
                     String thisArtist = musicCursor.getString(artistColumn);
                     songList.add(new Song(thisId, thisTitle, thisArtist));

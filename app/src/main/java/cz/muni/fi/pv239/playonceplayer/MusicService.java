@@ -93,7 +93,12 @@ public class MusicService extends Service implements
 
     @Override
     public void onDestroy() {
-        stopForeground(true);
+        super.onDestroy();
+        if (player.isPlaying()) {
+            player.stop();
+            player = null;
+        }
+        //stopForeground(true);
     }
     //-------------lifecycle methods END---------------------------
 
@@ -188,7 +193,7 @@ public class MusicService extends Service implements
         songTitle=playSong.getTitle();
 
         //get id
-        long currSong = playSong.getID();
+        long currSong = Long.parseLong(playSong.getID());
         //set uri
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,

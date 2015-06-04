@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
+    <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> -->
 
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
@@ -48,6 +48,15 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".GeneratePlaylistActivity"
+            android:label="@string/title_activity_generate_playlist" >
+        </activity>
+        <activity
+            android:name=".StreamRadioActivity"
+            android:label="@string/title_activity_stream_radio" >
+        </activity>
     </application>
 
 </manifest>

@@ -10,45 +10,35 @@
 
 package cz.muni.fi.pv239.playonceplayer;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import android.net.Uri;
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
-import android.widget.Button;
-import android.widget.ListView;
-
-import android.app.Activity;
-//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
-import android.widget.MediaController.MediaPlayerControl;
-import android.os.Bundle;
-import android.content.ServiceConnection;
 import android.content.ComponentName;
-import android.os.IBinder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Menu;
-
-import android.media.MediaPlayer;
+import android.widget.Button;
+import android.widget.MediaController.MediaPlayerControl;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
 import cz.muni.fi.pv239.playonceplayer.StreamService.StreamBinder;
 
+//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
 
-public class MainActivity extends Activity implements MediaPlayerControl {
 
-    //song list variables
-    private ArrayList<Song> songList;
-    private ListView songView;
+public class MainActivity extends ActionBarActivity implements MediaPlayerControl {
 
-    //service
+    //    //song list variables
+//    private ArrayList<Song> songList;
+//    private ListView songView;
+//
+//    //service
     private MusicService musicSrv;
     private StreamService streamSrv;
     private Intent playIntent;
@@ -58,11 +48,11 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
 
     //binding
-    private boolean musicBound=false;
-    private boolean streamBound=false;
+    private boolean musicBound = false;
+    private boolean streamBound = false;
 
     //activity and playback pause flags
-    private boolean paused=false, playbackPaused=false;
+    private boolean paused = false, playbackPaused = false;
 
     //media player for internet radio streaming
     private MediaPlayer player = new MediaPlayer();
@@ -75,49 +65,65 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         //create ui
         setContentView(R.layout.activity_main);
 
-        //retrieve list view
-        songView = (ListView)findViewById(R.id.song_list);
-        //instantiate list
-        songList = new ArrayList<Song>();
-        //get songs from device
-        getSongList();
-        //sort alphabetically by title
-        Collections.sort(songList, new Comparator<Song>(){
-            public int compare(Song a, Song b){
-                return a.getTitle().compareTo(b.getTitle());
-            }
-        });
-        //create and set adapter
-        SongAdapter songAdt = new SongAdapter(this, songList);
-        songView.setAdapter(songAdt);
 
-        //setup controller
-        setController();
+        ActionBar actionBar = getSupportActionBar();
+
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+
+        if (getIntent().getStringExtra("name") != null) {
+            actionBar.setTitle(getIntent().getStringExtra("name"));
+            //controller.show(0);
+        } else actionBar.setTitle("Choose a song!");
+//        //retrieve list view
+//        songView = (ListView)findViewById(R.id.song_list);
+//        //instantiate list
+//        songList = new ArrayList<Song>();
+//        //get songs from device
+//        getSongList();
+//        //sort alphabetically by title
+//        Collections.sort(songList, new Comparator<Song>() {
+//            public int compare(Song a, Song b) {
+//                return a.getTitle().compareTo(b.getTitle());
+//            }
+//        });
+//        //create and set adapter
+//        SongAdapter songAdt = new SongAdapter(this, songList);
+//        songView.setAdapter(songAdt);
+//
+//        //setup controller
+
+        if (isPlaying() || paused) {
+            controller.show(0);
+        } else {
+            setController();
+        }
     }
 
     //start and bind the service when the activity starts
     @Override
     protected void onStart() {
         super.onStart();
-        if(playIntent==null){
+        if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             //bind service using musicConnection object
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             //resulting to onStartCommand method in service class
             startService(playIntent);
+
         }
     }
 
-    public void buttonPlaylist(View view){
+    public void buttonPlaylist(View view) {
         handler = new Handler();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 handler.post(new Runnable() {
-                @Override
+                    @Override
                     public void run() {
                         Intent i = new Intent(MainActivity.this, PlaylistActivity.class);
-                     // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         MainActivity.this.startActivity(i);
                     }
                 });
@@ -125,39 +131,39 @@ public class MainActivity extends Activity implements MediaPlayerControl {
             }
         };
 
-       new Thread(runnable).start();
+        new Thread(runnable).start();
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
-        if(paused){
+        if (paused) {
             setController();
-            paused=false;
+            paused = false;
         }
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         //unbindService(musicConnection);
-        paused=true;
+        paused = true;
     }
 
     @Override
     protected void onStop() {
         controller.hide();
         super.onStop();
-        if(musicBound) {
+        if (musicBound) {
             unbindService(musicConnection);
-            musicBound=false;
+            musicBound = false;
         }
     }
 
     @Override
     protected void onDestroy() {
         stopService(playIntent);
-        musicSrv=null;
+        //musicSrv=null;
         player.stop();
         super.onDestroy();
     }
@@ -170,22 +176,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //menu item selected
-        switch (item.getItemId()) {
-            case R.id.action_shuffle:
-                musicSrv.setShuffle();
-                break;
-            case R.id.action_end:
-                stopService(playIntent);
-                musicSrv=null;
-                System.exit(0);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     //deliver the IBinder that the client can use to communicate with the service
     private ServiceConnection musicConnection = new ServiceConnection(){
 
@@ -195,7 +185,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
             //get service
             musicSrv = binder.getService();
             //pass list
-            musicSrv.setList(songList);
+            //musicSrv.setList(songList);
             musicBound = true;
         }
 
@@ -283,39 +273,39 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     }
 
     //method to retrieve song info from device
-    public void getSongList(){
-        //query external audio
-        ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-        //iterate over results if valid
-        if (!musicCursor.moveToFirst()) {
-            long thisId = 1;
-            String thisTitle = "there is nothing to show";
-            String thisArtist = "";
-            songList.add(new Song(thisId, thisTitle, thisArtist));
-
-
-        } else {
-            if (musicCursor != null && musicCursor.moveToFirst()) {
-                //get columns
-                int titleColumn = musicCursor.getColumnIndex
-                        (android.provider.MediaStore.Audio.Media.TITLE);
-                int idColumn = musicCursor.getColumnIndex
-                        (android.provider.MediaStore.Audio.Media._ID);
-                int artistColumn = musicCursor.getColumnIndex
-                        (android.provider.MediaStore.Audio.Media.ARTIST);
-                //add songs to list
-                do {
-                    long thisId = musicCursor.getLong(idColumn);
-                    String thisTitle = musicCursor.getString(titleColumn);
-                    String thisArtist = musicCursor.getString(artistColumn);
-                    songList.add(new Song(thisId, thisTitle, thisArtist));
-                }
-                while (musicCursor.moveToNext());
-            }
-        }
-    }
+//    public void getSongList(){
+//        //query external audio
+//        ContentResolver musicResolver = getContentResolver();
+//        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+//        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+//        //iterate over results if valid
+//        if (!musicCursor.moveToFirst()) {
+//            long thisId = 1;
+//            String thisTitle = "there is nothing to show";
+//            String thisArtist = "";
+//            songList.add(new Song(thisId, thisTitle, thisArtist));
+//
+//
+//        } else {
+//            if (musicCursor != null && musicCursor.moveToFirst()) {
+//                //get columns
+//                int titleColumn = musicCursor.getColumnIndex
+//                        (android.provider.MediaStore.Audio.Media.TITLE);
+//                int idColumn = musicCursor.getColumnIndex
+//                        (android.provider.MediaStore.Audio.Media._ID);
+//                int artistColumn = musicCursor.getColumnIndex
+//                        (android.provider.MediaStore.Audio.Media.ARTIST);
+//                //add songs to list
+//                do {
+//                    long thisId = musicCursor.getLong(idColumn);
+//                    String thisTitle = musicCursor.getString(titleColumn);
+//                    String thisArtist = musicCursor.getString(artistColumn);
+//                    songList.add(new Song(thisId, thisTitle, thisArtist));
+//                }
+//                while (musicCursor.moveToNext());
+//            }
+//        }
+//    }
 
 
 
@@ -388,35 +378,88 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
     };
 
+    //show playlist activity
+    private void showPlaylist(){
 
-    public void buttonOnClick(View v){
-        if(streamIntent==null){
+        handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(MainActivity.this, PlaylistActivity.class);
+                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        MainActivity.this.startActivity(i);
+                    }
+                });
+
+            }
+        };
+
+        new Thread(runnable).start();
+    }
+
+
+    private void showStreams(){
+    Intent i = new Intent(MainActivity.this, StreamRadioActivity.class);
+        MainActivity.this.startActivity(i);
+    }
+
+    //start stream radio
+    private void startStream() {
+
+
+        handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
+            }
+        };
+
+        if (streamIntent == null) {
             streamIntent = new Intent(this, StreamService.class);
-            //bind service using musicConnection object
+            //bind service using streamConnection object
             bindService(streamIntent, streamConnection, Context.BIND_AUTO_CREATE);
             //resulting to onStartCommand method in service class
             startService(streamIntent);
-        } else{
-            if (musicBound){
-                musicSrv.unbindService(musicConnection);
-                musicBound=false;
-            }
         }
-        if(player.isPlaying()) {
-            player.pause();
-            Button button = (Button) v;
-            ((Button) v).setText("PLAY");
-        }
-        else {
-            player.start();
-            ((Button) v).setText("PAUSE");
-        }
-        if(player.isLooping()){
-            System.out.println("---Media player is looping---");
-        }
-        else System.out.println("not looping");
-
-
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //menu item selected
+        switch (item.getItemId()) {
+            case R.id.action_shuffle:
+//                musicSrv.setShuffle();
+                break;
+            case R.id.action_playlist:
+                if(streamSrv != null){
+                    streamSrv.onDestroy();
+                }
+                this.showPlaylist();
+
+                break;
+            case R.id.action_stream:
+                if(musicSrv != null){
+                    musicSrv.onDestroy();
+                    //mozno este odbindovat a vsetko ukoncit
+                }
+                //this.startStream();
+                this.showStreams();
+                break;
+            case R.id.action_generated_playlists:
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
 }

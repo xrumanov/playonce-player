@@ -2,25 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#000000"
     tools:context=".PlaylistActivity"
     android:weightSum="1"
     android:orientation="vertical">
 
     <!-- ListView in which we will present the list of songs-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Actual Playlist:"
-        android:id="@+id/textView2"
-        android:textColor="#ffff5100" />
-
     <ListView
         android:id="@+id/song_list"
         android:layout_width="fill_parent"
-        android:layout_height="184dp">
+        android:layout_height="fill_parent">
         <!--android:saveEnabled="false"> for stop saving the Activity state to bundle-->
 
     </ListView>

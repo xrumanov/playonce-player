@@ -78,7 +78,11 @@ public class StreamService extends Service {//AudioManager.OnAudioFocusChangeLis
 
     @Override
     public void onDestroy() {
-        stopForeground(true);
+        super.onDestroy();
+        if (streamPlayer.isPlaying()) {
+            streamPlayer.stop();
+            streamPlayer = null;
+        }
     }
     //-------------lifecycle methods END---------------------------
 
