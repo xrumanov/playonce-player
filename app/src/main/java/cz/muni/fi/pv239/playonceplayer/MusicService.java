@@ -16,6 +16,7 @@ import android.util.Log;
 import android.os.IBinder;
 import android.content.Intent;
 
+import java.util.Collections;
 import java.util.Random;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -47,6 +48,14 @@ public class MusicService extends Service implements
     //for shuffling the songs
     private boolean shuffle=false;
     private Random rand;
+
+    //shuffled playlist helper
+    private ArrayList<Song> shuffledList;
+    //id of a song which is to be played next in shuffledList
+    private int shuffledSongId;
+
+    //true, if checkbox is checked, false otherwise
+    private boolean shuffled;
 
 
     public String getSongTitle(){
@@ -261,11 +270,22 @@ public class MusicService extends Service implements
     }
 
 
-    //set the shuffle flag
-    public void setShuffle(){
-        if(shuffle) shuffle=false;
-        else shuffle=true;
-    }
+
+        //set the shuffle flag
+        public void setShuffle(){
+            //if(shuffle) {
+            //   !//shuffle=false;
+
+            // }
+            //else {
+            shuffle=true;
+            shuffledList = songs;
+            Collections.shuffle(shuffledList);
+
+            this.setList(shuffledList);
+
+            }
+
 
 
 
