@@ -8,7 +8,6 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.Pair;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,7 +25,7 @@ import java.util.List;
 /**
  * @author m.cimbalek
  */
-public class StorePlaylistService extends Service {
+public class PlaylistHistoryService extends Service {
 
     private static final String PLAYLIST_PREFRENCES_NAME = "playlist-data";
     private static final String LAST_EXPORTED_MONTH = "last-exported-month";
@@ -34,7 +33,7 @@ public class StorePlaylistService extends Service {
     private static final int DEFAULT_EXPORT_DAY = 1;
     private static final String PLAYLIST_SAVE_DIR = "/Playlist history";
     private static final String STORED_PLAYLIST_TMP = "last-month-playlist.lmp";
-    private static final String TAG = "StorePlaylistService";
+    private static final String TAG = "PlaylistHistoryService";
 
 
     private final IBinder playlistBind = new PlaylistBinder();
@@ -43,7 +42,7 @@ public class StorePlaylistService extends Service {
     private int lastExportedMonth;
     private int exportDay;
 
-    private List<Pair<String, String>> playedSongs;
+    private List<Song> playedSongs;
 
     /* ---- PUBLIC METHODS ---- */
 
@@ -53,10 +52,6 @@ public class StorePlaylistService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        if (playedSongs == null) {
-            playedSongs = new ArrayList<>();
-        }
 
         SharedPreferences storedPlaylistSettings = getSharedPreferences(PLAYLIST_PREFRENCES_NAME, MODE_PRIVATE);
         lastExportedMonth = storedPlaylistSettings.getInt(LAST_EXPORTED_MONTH, getLastMonth());
@@ -80,6 +75,10 @@ public class StorePlaylistService extends Service {
         return playlistBind;
     }
 
+    public List<Song> getPlayedSongs() {
+        return playedSongs;
+    }
+
     /**
      * Provides export of last month played songs list. Can be used to forced export.
      *
@@ -92,8 +91,8 @@ public class StorePlaylistService extends Service {
         if (isExternalStorageWritable()) {
             try {
                 writer = new BufferedWriter(new FileWriter(playlistToStore));
-                for (Pair<String, String> toWrite : playedSongs) {
-                    writer.append(pairToString(toWrite)).append("\n");
+                for (Song toWrite : playedSongs) {
+                    writer.append(toWrite.toString()).append("\n");
                 }
                 writer.close();
                 this.lastExportedMonth = getCurrentMonth();
@@ -109,15 +108,14 @@ public class StorePlaylistService extends Service {
 
     /**
      * Adds song to the list of played songs during last month period.
-     * @param artist Artist of song-to-save.
-     * @param song Name of song-to-save.
+     * @param song Song-to-save.
      * @return True if song was saved, False otherwise (song is already saved in list).
      */
-    public boolean addPlayedSong(String artist, String song) {
+    public boolean addPlayedSong(Song song) {
         //first check if it shouldn't already benn exported
         checkExport();
-        if (!isAlreadyPlayedThisMonth(artist, song)) {
-            playedSongs.add(new Pair<>(artist, song));
+        if (!isAlreadyPlayedThisMonth(song)) {
+            playedSongs.add(song);
             return true;
         }
         return false;
@@ -143,13 +141,12 @@ public class StorePlaylistService extends Service {
 
     /**
      * Checks if song was already played in last month period.
-     * @param artist Artist of song-to-check.
-     * @param song Name of song-to-check.
+     * @param song Song-to-check.
      * @return True if song was already played, False otherwise.
      */
     @SuppressWarnings("Unchecked")
-    public boolean isAlreadyPlayedThisMonth(String artist, String song) {
-        return playedSongs.contains(new Pair(artist, song));
+    public boolean isAlreadyPlayedThisMonth(Song song) {
+        return playedSongs.contains(song);
     }
 
     /**
@@ -221,16 +218,6 @@ public class StorePlaylistService extends Service {
     }
 
     /**
-     * Puts Author and name of song saved in pair to string separated with dash.
-     *
-     * @param artistAndSong Pair with artist and song to put into String.
-     * @return string with artist and song separated with dash.
-     */
-    private String pairToString(Pair<String, String> artistAndSong) {
-        return artistAndSong.first + " - " + artistAndSong.second;
-    }
-
-    /**
      * Checks if it's time to export last month playlist.
      *
      * @return Info if export was succesfull or not, null if it's not time to export yet.
@@ -282,14 +269,17 @@ public class StorePlaylistService extends Service {
      * Loads last month playlist from persisted file.
      * @return Last month playlist.
      */
-    private List<Pair<String, String>> loadPlayedSongsFromFile() {
-        ArrayList<Pair<String, String>> storedPlayedSongs = null;
+    private List<Song> loadPlayedSongsFromFile() {
+        List<Song> storedPlayedSongs = null;
         try {
             FileInputStream fis = openFileInput(STORED_PLAYLIST_TMP);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            storedPlayedSongs = (ArrayList<Pair<String, String>>) ois.readObject();
+            storedPlayedSongs = (ArrayList<Song>) ois.readObject();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        if(storedPlayedSongs == null) {
+            storedPlayedSongs = new ArrayList<Song>();
         }
         return storedPlayedSongs;
     }
@@ -301,8 +291,8 @@ public class StorePlaylistService extends Service {
      * No f*cking idea
      */
     public class PlaylistBinder extends Binder {
-        StorePlaylistService getService() {
-            return StorePlaylistService.this;
+        PlaylistHistoryService getService() {
+            return PlaylistHistoryService.this;
         }
     }
 }

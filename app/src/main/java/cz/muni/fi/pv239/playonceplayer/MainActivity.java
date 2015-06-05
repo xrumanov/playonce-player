@@ -22,11 +22,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
 import android.widget.MediaController.MediaPlayerControl;
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
+
+//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
 
 
 
@@ -36,6 +36,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     private MusicService musicSrv;
     private StreamService streamSrv;
     private Intent playIntent;
+    private PlaylistHistoryService playlistHistoryService;
     //controller
     private MusicController controller;
     private ActionBar actionBar;
@@ -86,9 +87,13 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             //bind service using musicConnection object
+            //FIXME: playlistHistoryService = new PlaylistHistoryService();
+            Intent phsIntent = new Intent(this, PlaylistHistoryService.class);
+            //FIXME: bindService(phsIntent, musicConnection, Context.BIND_AUTO_CREATE);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             //resulting to onStartCommand method in service class
             startService(playIntent);
+            //FIXME: startService(phsIntent);
 
         }
     }
@@ -97,15 +102,15 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     protected void onResume() {
         super.onResume();
         if (paused) {
-            setController();
             paused = false;
+            setController();
         }
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         paused = true;
+        super.onPause();
     }
 
     @Override
@@ -186,8 +191,9 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     @Override
     public boolean isPlaying() {
-        if(musicSrv!=null && musicBound)
+        if(musicSrv!=null && musicBound) {
             return musicSrv.isPng();
+        }
             playbackPaused = false;
         return false;
     }
@@ -241,6 +247,9 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             case R.id.action_generated_playlists:
 
                 break;
+            /* FIXME:case R.id.action_playlist_history:
+                this.showPlaylistHistory();
+                break;*/
 
         }
         return super.onOptionsItemSelected(item);
@@ -273,8 +282,8 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         musicSrv.playNext();
         actionBar.setTitle(musicSrv.getSongTitle());
         if(playbackPaused){
-            setController();
             playbackPaused=false;
+            setController();
         }
 
         controller.show(0);
@@ -285,8 +294,8 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         musicSrv.playPrev();
         actionBar.setTitle(musicSrv.getSongTitle());
         if (playbackPaused) {
-            setController();
             playbackPaused = false;
+            setController();
         }
         controller.show(0);
     }
@@ -305,6 +314,27 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
                     @Override
                     public void run() {
                         Intent i = new Intent(MainActivity.this, PlaylistActivity.class);
+                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        MainActivity.this.startActivity(i);
+                    }
+                });
+
+            }
+        };
+
+        new Thread(runnable).start();
+    }
+
+    private void showPlaylistHistory(){
+
+        handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(MainActivity.this, PlaylistHistoryActivity.class);
                         // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         MainActivity.this.startActivity(i);
                     }

@@ -54,6 +54,32 @@ public class Song implements Parcelable{
                 this.artist});
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Song song = (Song) o;
+
+        if (!id.equalsIgnoreCase(song.id)) return false;
+        if (title != null ? !title.equalsIgnoreCase(song.title) : song.title != null) return false;
+        return !(artist != null ? !artist.equalsIgnoreCase(song.artist) : song.artist != null);
+
+    }
+
+    @Override
+    public String toString() {
+        return artist + " - " + title;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (artist != null ? artist.hashCode() : 0);
+        return result;
+    }
+
     //------------------CREATOR mandatory method ---------------------------------
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         public Song createFromParcel(Parcel in) {

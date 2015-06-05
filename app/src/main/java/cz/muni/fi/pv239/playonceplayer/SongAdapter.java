@@ -2,26 +2,26 @@
 
 package cz.muni.fi.pv239.playonceplayer;
 
-import java.util.ArrayList;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import android.widget.BaseAdapter;
-import android.view.View;
-import android.view.ViewGroup;
+import java.util.List;
 /**
  * Created by jrumanov on 4/24/15.
  */
 
 public class SongAdapter extends BaseAdapter {
 
-    private ArrayList<Song> songs;
+    private List<Song> songs;
     private LayoutInflater songInf;
 
     //a constructor method
-    public SongAdapter(Context c, ArrayList<Song> theSongs){
+    public SongAdapter(Context c, List<Song> theSongs){
         songs=theSongs;
         songInf=LayoutInflater.from(c);
     }

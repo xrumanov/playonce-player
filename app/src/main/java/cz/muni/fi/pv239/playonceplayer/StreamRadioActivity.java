@@ -4,11 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+
 import cz.muni.fi.pv239.playonceplayer.StreamService.StreamBinder;
 
 
@@ -41,8 +41,8 @@ public class StreamRadioActivity extends ActionBarActivity {
         data.add( new Radio(1, "Radio Slovensko","http://icecast.stv.livebox.sk/slovensko_128.mp3"));
         data.add(new Radio(2, "Europa2 SK", "http://pool.cdn.lagardere.cz/fm-europa2sk-128"));
         data.add(new Radio(3, "Evropa2 CZ", "http://icecast3.play.cz:80/evropa2-128.mp3"));
-        data.add( new Radio(4, "Kiss Hady","http://icecast1.play.cz/kisshady64.mp3"));
-        data.add( new Radio(5, "BBC UK CZ","http://icecast3.play.cz:80/evropa2-128.mp3"));
+        data.add(new Radio(4, "Kiss Hady", "http://icecast1.play.cz/kisshady64.mp3"));
+        data.add(new Radio(5, "BBC UK CZ", "http://icecast3.play.cz:80/evropa2-128.mp3"));
         data.add( new Radio(6, "Deutsche Welle","http://icecast3.play.cz:80/evropa2-128.mp3"));
         data.add(new Radio(7, "OE3", "http://icecast3.play.cz:80/evropa2-128.mp3"));
         data.add( new Radio(8, "Evropa2 CZ","http://icecast3.play.cz:80/evropa2-128.mp3"));
@@ -123,7 +123,9 @@ public class StreamRadioActivity extends ActionBarActivity {
                 break;
             case R.id.action_generated_playlists:
                 break;
-
+            /*FIXME: case R.id.action_playlist_history:
+                this.showPlaylistHistory();
+                break;*/
         }
         return super.onOptionsItemSelected(item);
 
@@ -159,6 +161,27 @@ private ServiceConnection streamConnection = new ServiceConnection(){
                     @Override
                     public void run() {
                         Intent i = new Intent(StreamRadioActivity.this, PlaylistActivity.class);
+                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        StreamRadioActivity.this.startActivity(i);
+                    }
+                });
+
+            }
+        };
+
+        new Thread(runnable).start();
+    }
+
+    private void showPlaylistHistory(){
+
+        handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(StreamRadioActivity.this, PlaylistHistoryActivity.class);
                         // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         StreamRadioActivity.this.startActivity(i);
                     }

@@ -3,26 +3,23 @@
 
 package cz.muni.fi.pv239.playonceplayer;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
-import java.util.ArrayList;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.os.IBinder;
-import android.content.Intent;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-
 /**
  * Created by jrumanov on 4/24/15.
  */
@@ -34,8 +31,9 @@ public class MusicService extends Service implements
 
     //media player
     private MediaPlayer player;
+    //FIXME: private PlaylistHistoryService playlistHistoryService = new PlaylistHistoryService();
     //song list
-    private ArrayList<Song> songs;
+    private List<Song> songs;
     //current position
     private int songPosn;
 
@@ -50,7 +48,7 @@ public class MusicService extends Service implements
     private Random rand;
 
     //shuffled playlist helper
-    private ArrayList<Song> shuffledList;
+    private List<Song> shuffledList;
     //id of a song which is to be played next in shuffledList
     private int shuffledSongId;
 
@@ -123,6 +121,7 @@ public class MusicService extends Service implements
         if(player.getCurrentPosition()>0){
             mp.reset();
             playNext();
+            //FIXME: playlistHistoryService.addPlayedSong(songs.get(songPosn));
         }
     }
     //----------onCompletionListener mandatory method END----------
@@ -187,7 +186,7 @@ public class MusicService extends Service implements
     }
 
     //method to pass the list of songs from the Activity
-    public void setList(ArrayList<Song> theSongs){
+    public void setList(List<Song> theSongs){
 
         songs=theSongs;
     }

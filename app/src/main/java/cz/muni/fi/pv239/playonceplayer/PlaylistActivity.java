@@ -10,28 +10,29 @@
 
 package cz.muni.fi.pv239.playonceplayer;
 
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import android.net.Uri;
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.support.v7.app.ActionBarActivity;
-import android.widget.ListView;
-
-import android.os.Bundle;
-import android.content.ServiceConnection;
-import android.content.ComponentName;
-import android.os.IBinder;
-import android.content.Context;
-import android.content.Intent;
-
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Menu;
-
 
 import cz.muni.fi.pv239.playonceplayer.MusicService.MusicBinder;
+
+//MediaController presents a widget with play/pause, rewind, fast-forward, and skip (previous/next) buttons
 
 
 public class PlaylistActivity extends ActionBarActivity {
@@ -39,7 +40,7 @@ public class PlaylistActivity extends ActionBarActivity {
     //song list variables
     private ArrayList<Song> songList;
     private ListView songView;
-
+    private Handler handler;
     //service
     private MusicService musicSrv;
     private Intent playIntent;
@@ -109,7 +110,9 @@ public class PlaylistActivity extends ActionBarActivity {
             case R.id.action_generated_playlists:
 
                 break;
-
+            /*FIXME: case R.id.action_playlist_history:
+                this.showPlaylistHistory();
+                break;*/
         }
         return super.onOptionsItemSelected(item);
 
@@ -190,5 +193,25 @@ public class PlaylistActivity extends ActionBarActivity {
     private void showStreams(){
         Intent i = new Intent(PlaylistActivity.this, StreamRadioActivity.class);
         PlaylistActivity.this.startActivity(i);
+    }
+    private void showPlaylistHistory(){
+
+        handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(PlaylistActivity.this, PlaylistHistoryActivity.class);
+                        // i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        PlaylistActivity.this.startActivity(i);
+                    }
+                });
+
+            }
+        };
+
+        new Thread(runnable).start();
     }
 }
