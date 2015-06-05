@@ -40,14 +40,6 @@ public class PlaylistActivity extends ActionBarActivity {
     private ArrayList<Song> songList;
     private ListView songView;
 
-    //shuffled playlist helper
-    private ArrayList<Song> shuffledList;
-    //id of a song which is to be played next in shuffledList
-    private int shuffledSongId;
-
-    //true, if checkbox is checked, false otherwise
-    private boolean shuffled;
-
     //service
     private MusicService musicSrv;
     private Intent playIntent;

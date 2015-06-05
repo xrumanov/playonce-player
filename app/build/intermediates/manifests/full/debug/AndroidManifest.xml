@@ -44,7 +44,8 @@
 
         <activity
             android:name="cz.muni.fi.pv239.playonceplayer.PlaylistActivity"
-            android:label="@string/title_activity_playlist" >
+            android:label="@string/title_activity_playlist"
+            android:screenOrientation="portrait" >
         </activity>
 
         <service
@@ -55,11 +56,13 @@
 
         <activity
             android:name="cz.muni.fi.pv239.playonceplayer.GeneratePlaylistActivity"
-            android:label="@string/title_activity_generate_playlist" >
+            android:label="@string/title_activity_generate_playlist"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="cz.muni.fi.pv239.playonceplayer.StreamRadioActivity"
-            android:label="@string/title_activity_stream_radio" >
+            android:label="@string/title_activity_stream_radio"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
