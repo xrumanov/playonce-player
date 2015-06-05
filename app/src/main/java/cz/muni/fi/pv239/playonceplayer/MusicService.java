@@ -6,8 +6,11 @@ package cz.muni.fi.pv239.playonceplayer;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -31,7 +34,7 @@ public class MusicService extends Service implements
 
     //media player
     private MediaPlayer player;
-    //FIXME: private PlaylistHistoryService playlistHistoryService = new PlaylistHistoryService();
+    private PlaylistHistoryService playlistHistoryService;
     //song list
     private List<Song> songs;
     //current position
@@ -54,7 +57,10 @@ public class MusicService extends Service implements
 
     //true, if checkbox is checked, false otherwise
     private boolean shuffled;
+    private boolean historyBound;
 
+
+    private Intent phsIntent;
 
     public String getSongTitle(){
         return songTitle;
@@ -72,6 +78,10 @@ public class MusicService extends Service implements
         initMusicPlayer();
 
         rand=new Random();
+
+
+        phsIntent = new Intent(this, PlaylistHistoryService.class);
+        bindService(phsIntent, historyConnection, Context.BIND_AUTO_CREATE);
 
         //AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         //int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
@@ -121,7 +131,7 @@ public class MusicService extends Service implements
         if(player.getCurrentPosition()>0){
             mp.reset();
             playNext();
-            //FIXME: playlistHistoryService.addPlayedSong(songs.get(songPosn));
+            playlistHistoryService.addPlayedSong(songs.get(songPosn));
         }
     }
     //----------onCompletionListener mandatory method END----------
@@ -295,5 +305,22 @@ public class MusicService extends Service implements
             return MusicService.this;
         }
     }
+
+    private ServiceConnection historyConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PlaylistHistoryService.PlaylistHistoryBinder binder = (PlaylistHistoryService.PlaylistHistoryBinder) service;
+            //get service
+            playlistHistoryService = binder.getService();
+            historyBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+            historyBound = false;
+        }
+    };
 }
 

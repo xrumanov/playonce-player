@@ -23,16 +23,18 @@ public class PlaylistHistoryActivity extends ActionBarActivity {
 
     private Intent playIntent;
     private ListView songView;
-    private PlaylistHistoryService service;
+    private PlaylistHistoryService phservice;
     private MusicService musicSrv;
     private boolean musicBound = false;
+    private boolean historyBound;
+    private Intent phsIntent;
 
     private ServiceConnection musicConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder iService) {
             MusicService.MusicBinder binder = (MusicService.MusicBinder) iService;
-            //get service
+            //get phservice
             musicSrv = binder.getService();
             //pass list
             musicSrv.setList(songList);
@@ -49,12 +51,12 @@ public class PlaylistHistoryActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
+        phsIntent = new Intent(this, PlaylistHistoryService.class);
+        bindService(phsIntent, historyConnection, Context.BIND_AUTO_CREATE);
         songView = (ListView) findViewById(R.id.song_list);
+        songList = phservice.getPlayedSongs();
         SongAdapter songAdt = new SongAdapter(this,songList);
         songView.setAdapter(songAdt);
-        service = new PlaylistHistoryService();
-        service.startService(playIntent);
-        songList = service.getPlayedSongs();
 
     }
 
@@ -71,7 +73,7 @@ public class PlaylistHistoryActivity extends ActionBarActivity {
         if (playIntent == null) {
             playIntent = new Intent(this, PlaylistHistoryService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            //resulting to onStartCommand method in service class
+            //resulting to onStartCommand method in phservice class
             startService(playIntent);
         }
     }
@@ -140,4 +142,20 @@ public class PlaylistHistoryActivity extends ActionBarActivity {
 
         new Thread(runnable).start();
     }
+    private ServiceConnection historyConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PlaylistHistoryService.PlaylistHistoryBinder binder = (PlaylistHistoryService.PlaylistHistoryBinder) service;
+            //get phservice
+            phservice = binder.getService();
+            historyBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+            historyBound = false;
+        }
+    };
 }

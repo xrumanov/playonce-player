@@ -9,4 +9,5 @@
     <string name="title_activity_playlist">PlaylistActivity</string>
     <string name="title_activity_generate_playlist">GeneratePlaylistActivity</string>
     <string name="title_activity_stream_radio">StreamRadioActivity</string>
+    <string name="title_activity_playlist_history">PlaylistHistoryActivity</string>
 </resources>

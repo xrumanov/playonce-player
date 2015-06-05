@@ -60,6 +60,15 @@
             android:label="@string/title_activity_stream_radio"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".PlaylistHistoryActivity"
+            android:label="@string/title_activity_playlist_history"
+            android:screenOrientation="portrait" >
+        </activity>
+        <service android:name=".PlaylistHistoryService"
+                 android:enabled="true"
+                 android:exported="true"/>
     </application>
 
 </manifest>

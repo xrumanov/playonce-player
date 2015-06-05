@@ -110,9 +110,9 @@ public class PlaylistActivity extends ActionBarActivity {
             case R.id.action_generated_playlists:
 
                 break;
-            /*FIXME: case R.id.action_playlist_history:
+            case R.id.action_playlist_history:
                 this.showPlaylistHistory();
-                break;*/
+                break;
         }
         return super.onOptionsItemSelected(item);
 

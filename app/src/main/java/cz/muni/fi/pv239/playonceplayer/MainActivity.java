@@ -36,6 +36,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     private MusicService musicSrv;
     private StreamService streamSrv;
     private Intent playIntent;
+    private Intent phsIntent;
     private PlaylistHistoryService playlistHistoryService;
     //controller
     private MusicController controller;
@@ -44,6 +45,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     //binding
     private boolean musicBound = false;
+    private boolean historyBound = false;
 
 
     //activity and playback pause flags
@@ -87,13 +89,12 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             //bind service using musicConnection object
-            //FIXME: playlistHistoryService = new PlaylistHistoryService();
-            Intent phsIntent = new Intent(this, PlaylistHistoryService.class);
-            //FIXME: bindService(phsIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            phsIntent = new Intent(this, PlaylistHistoryService.class);
+            bindService(phsIntent, historyConnection, Context.BIND_AUTO_CREATE);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             //resulting to onStartCommand method in service class
             startService(playIntent);
-            //FIXME: startService(phsIntent);
+            startService(phsIntent);
 
         }
     }
@@ -146,6 +147,23 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         public void onServiceDisconnected(ComponentName name) {
 
             musicBound = false;
+        }
+    };
+
+    private ServiceConnection historyConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PlaylistHistoryService.PlaylistHistoryBinder binder = (PlaylistHistoryService.PlaylistHistoryBinder) service;
+            //get service
+            playlistHistoryService = binder.getService();
+            historyBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+            historyBound = false;
         }
     };
 
@@ -247,9 +265,9 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             case R.id.action_generated_playlists:
 
                 break;
-            /* FIXME:case R.id.action_playlist_history:
+            case R.id.action_playlist_history:
                 this.showPlaylistHistory();
-                break;*/
+                break;
 
         }
         return super.onOptionsItemSelected(item);

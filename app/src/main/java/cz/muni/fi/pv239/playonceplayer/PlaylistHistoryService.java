@@ -36,7 +36,7 @@ public class PlaylistHistoryService extends Service {
     private static final String TAG = "PlaylistHistoryService";
 
 
-    private final IBinder playlistBind = new PlaylistBinder();
+    private final IBinder playlistBind = new PlaylistHistoryBinder();
 
 
     private int lastExportedMonth;
@@ -87,7 +87,7 @@ public class PlaylistHistoryService extends Service {
     public String doExportPlaylist() {
         String message;
         Writer writer;
-        File playlistToStore = getPlaylistStorageDir(String.valueOf(getCurrentYear()) + "-" + String.valueOf(getCurrentMonth()));
+        File playlistToStore = getPlaylistStorageDir(String.valueOf(getCurrentYear()) + "-" + String.valueOf(getCurrentMonth()) + ".phf");
         if (isExternalStorageWritable()) {
             try {
                 writer = new BufferedWriter(new FileWriter(playlistToStore));
@@ -224,7 +224,8 @@ public class PlaylistHistoryService extends Service {
      */
     private String checkExport() {
         if (((lastExportedMonth == getLastMonth()) && (exportDay >= getCurrentDayOfMonth())
-                || (lastExportedMonth <= getMonthBeforeLast()))) {
+                || (lastExportedMonth <= getMonthBeforeLast()))
+                && playedSongs != null && !playedSongs.isEmpty()) {
             return doExportPlaylist();
         }
         return null;
@@ -239,11 +240,11 @@ public class PlaylistHistoryService extends Service {
     private File getPlaylistStorageDir(String playlistName) {
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_MUSIC) + PLAYLIST_SAVE_DIR, playlistName);
-        if (!file.mkdirs()) {
-            Log.e("Error", "Directory " + file.getPath() + " not created.");
-        } else {
+        //if (!file.mkdirs()) {
+        //    Log.e("Error", "Directory " + file.getPath() + " not created.");
+        //} else {
             Log.d(TAG, "File: \"" + file.getName() + "\" succefully created in \"" + file.getPath() + "\".");
-        }
+        //}
         return file;
     }
 
@@ -290,7 +291,7 @@ public class PlaylistHistoryService extends Service {
     /**
      * No f*cking idea
      */
-    public class PlaylistBinder extends Binder {
+    public class PlaylistHistoryBinder extends Binder {
         PlaylistHistoryService getService() {
             return PlaylistHistoryService.this;
         }

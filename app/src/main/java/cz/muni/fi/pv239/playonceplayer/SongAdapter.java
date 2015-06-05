@@ -60,5 +60,8 @@ public class SongAdapter extends BaseAdapter {
         songLay.setTag(position);
         return songLay;
     }
+    public void setSongs(List<Song> songs){
+        this.songs = songs;
+    }
 
 }

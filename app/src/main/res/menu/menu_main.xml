@@ -21,9 +21,9 @@
         android:orderInCategory="4"
         android:title="Generated Playlists"/>
 
-    <!-- FIXME: <item
+    <item
         android:id="@+id/action_playlist_history"
         android:orderInCategory="5"
-        android:title="Playlist history"/>-->
+        android:title="Playlist history"/>
 
 </menu>
